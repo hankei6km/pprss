@@ -1,6 +1,8 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 
+var path = require('path');
+
 var config = require('./taskconfig.js');
 
 
@@ -69,8 +71,19 @@ gulp.task('bs-reload', function() {
 });
 
 
-gulp.task('watch', ['copy', 'js', 'lint', 'browser-sync'], function(){
-  gulp.watch(config.srcFiles, ['copy']);
+// ----------------
+// ttrss-node
+// ----------------
+gulp.task('ttrss-node', function() {
+  return browserify('.' + path.sep + path.join(config.src, 'js/ttrss-node.js'), {standalone: 'TTrss'})
+    .bundle()
+    .pipe(source('js/ttrss-node.js'))
+    .pipe(gulp.dest(config.dest));
+});
+
+
+gulp.task('watch', ['lint', 'copy', 'js', 'ttrss-node', 'browser-sync'], function(){
+  gulp.watch(config.srcFiles, ['copy', 'ttrss-node']);
   gulp.watch(config.lintFiles , ['lint']);
   gulp.watch(config.destFiles, ['bs-reload']);
 });
