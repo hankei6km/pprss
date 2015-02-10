@@ -1,0 +1,24 @@
+{
+  "name": "pprss",
+  "version": "0.1.0",
+  "authors": [
+    "hankei6km <hankei6km@gmail.com>"
+  ],
+  "description": "ttrss client bulit by polymer",
+  "main": "src/index.html",
+  "keywords": [
+    "polymer",
+    "ttrss"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "src/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.4"
+  }
+}
