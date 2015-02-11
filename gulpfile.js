@@ -92,6 +92,11 @@ gulp.task('watch:demo', ['lint', 'copy', 'js', 'ttrss-node', 'browser-sync:demo'
   gulp.watch(config.demoFiles, ['reload']);
 });
 
+require('web-component-tester').gulp.init(gulp);
+gulp.task('watch:test', ['watch:demo'], function(){
+  gulp.watch(config.testFiles, ['test:local']);
+});
+
 
 // ----------------
 // ttrss-node

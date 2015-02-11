@@ -66,6 +66,11 @@ config.destFiles = [
   config.destComponents
 ];
 
+config.testFiles = [
+  config.testGlobHtml,
+  config.testGlobJs
+];
+
 config.demoFiles = [
   config.destGlobHtml,
   config.destGlobJs,
