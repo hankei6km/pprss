@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>ttrss-ajax</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <script src="../../dist/js/libs/ttrss-node.js"></script>
+</head>
+<body>
+
+  <script>
+    chai.should();
+
+    describe('<ttrss-node>', function() {
+
+      it('shuold be done initialize', function() {
+        var client = TTrss('http://local:4000', {user: 'test-user', password :'test-password'});
+        client.should.be.a('Object')
+      });
+
+    });
+  </script>
+
+</body>
+</html>

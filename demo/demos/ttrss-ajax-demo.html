@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>ttrss-ajax demos</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        padding: 24px;
+      }
+      section {
+        margin: 0px;
+        padding-bottom: 24px;
+      }
+      paper-input {
+        width: 80%;
+      }
+      paper-button.colored {
+        color: #4285f4;
+      }
+      paper-button[raised].colored {
+        background: #4285f4;
+        color: #fff;
+      }
+    </style>
+
+    <link rel="import" href="../bower_components/core-item/core-item.html">
+    <link rel="import" href="../bower_components/paper-input/paper-input.html">
+    <link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+    <script src="../js/libs/ttrss-node.js"></script>
+  </head>
+  <body fullbleed unresolved>
+    <template is="auto-binding">
+    <section>
+      <paper-input id="url" label="url" value="{{url}}"></paper-input>
+      <paper-input id="user" label="user" value="{{user}}"></paper-input>
+      <paper-input id="password" label="password" value="{{password}}"></paper-input>
+    </section>
+    <paper-button raised class="colored" on-tap="{{handleOnTap}}">GET</paper-button>
+
+    <section hidden?="{{(errorMsg === '')}}">
+      <core-item icon="error" label="{{errorMsg}}"></core-item>
+    </section>
+
+    </template>
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      template.ready = function(e){
+        this.client = null;
+        this.errorMsg = '';
+      };
+      template.handleOnTap = function(e){
+        this.errorMsg = '';
+        this.client = new TTrss(this.url, {user: this.user, password: this.password});
+        var that = this;
+        this.client.login(function(err, sid){
+          if(!err){
+            console.log(sid);
+          }else{
+            that.errorMsg = err.message;
+          }
+        }); 
+      };
+    </script>
+  </body>
+</html>

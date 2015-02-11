@@ -102,8 +102,13 @@ gulp.task('watch:test', ['watch:demo'], function(){
 // ttrss-node
 // ----------------
 gulp.task('ttrss-node', function() {
-  return browserify('.' + path.sep + path.join(config.src, 'js/ttrss-node.js'), {standalone: 'TTrss'})
+  return browserify('.' + path.sep + path.join(config.src, 'js/libs/ttrss-node.js'), {standalone: 'TTrss'})
     .bundle()
-    .pipe(source('js/ttrss-node.js'))
+    .pipe(source('js/libs/ttrss-node.js'))
+    // optional, remove if you dont want sourcemaps
+      .pipe(buffer())
+      .pipe(sourcemaps.init({loadMaps: true})) // loads map from browserify file
+      .pipe(sourcemaps.write('./')) // writes .map file
+    //
     .pipe(gulp.dest(config.dest));
 });
