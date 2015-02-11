@@ -3,7 +3,8 @@ var path = require('path');
 var config = {
   src: './src',
   dest: './dist',
-  test: './test'
+  test: './test',
+  demo: './demo'
 };
 // if change `config.src`, 
 // change '/src/bower_components/*' in .gitigonre and `directory` of .bowerrc.
@@ -33,6 +34,9 @@ config.testGlobJs = '.' + path.sep + path.join(config.test, '**/*.js');
 config.testComponents = '.' + path.sep + path.join(config.test, 'bower_components/**/*');
 config.testExcludeComponents = '!' + config.testComponents;
 
+config.demoGlobHtml = '.' + path.sep + path.join(config.demo, '**/*.html');
+config.demoGlobJs = '.' + path.sep + path.join(config.demo, '**/*.js');
+
 config.srcFiles = [
   config.srcGlobHtml,
   config.srcGlobJs,
@@ -60,6 +64,17 @@ config.destFiles = [
   config.destGlobImage,
   config.destGlobElement,
   config.destComponents
+];
+
+config.demoFiles = [
+  config.destGlobHtml,
+  config.destGlobJs,
+  config.destGlobStylesheet,
+  config.destGlobImage,
+  config.destGlobElement,
+  config.destComponents,
+  config.demoGlobHtml,
+  config.demoGlobJs
 ];
 
 module.exports = config;

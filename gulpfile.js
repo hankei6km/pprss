@@ -66,8 +66,30 @@ gulp.task('browser-sync', function() {
     }
   });
 });
-gulp.task('bs-reload', function() {
+gulp.task('reload', function() {
   browserSync.reload();
+});
+gulp.task('watch', ['lint', 'copy', 'js', 'ttrss-node', 'browser-sync'], function(){
+  gulp.watch(config.srcFiles, ['copy', 'ttrss-node']);
+  gulp.watch(config.lintFiles , ['lint']);
+  gulp.watch(config.destFiles, ['reload']);
+});
+
+
+// Static server(demo)
+gulp.task('browser-sync:demo', function() {
+  browserSync({
+    online: false, // supress reload at task startup
+    port: 4000, 
+    server: {
+      baseDir: [config.dest, config.demo]
+    }
+  });
+});
+gulp.task('watch:demo', ['lint', 'copy', 'js', 'ttrss-node', 'browser-sync:demo'], function(){
+  gulp.watch(config.srcFiles, ['copy', 'ttrss-node']);
+  gulp.watch(config.lintFiles , ['lint']);
+  gulp.watch(config.demoFiles, ['reload']);
 });
 
 
@@ -79,11 +101,4 @@ gulp.task('ttrss-node', function() {
     .bundle()
     .pipe(source('js/ttrss-node.js'))
     .pipe(gulp.dest(config.dest));
-});
-
-
-gulp.task('watch', ['lint', 'copy', 'js', 'ttrss-node', 'browser-sync'], function(){
-  gulp.watch(config.srcFiles, ['copy', 'ttrss-node']);
-  gulp.watch(config.lintFiles , ['lint']);
-  gulp.watch(config.destFiles, ['bs-reload']);
 });
