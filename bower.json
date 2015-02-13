@@ -23,6 +23,7 @@
     "paper-input": "Polymer/paper-input#~0.5.4",
     "paper-button": "Polymer/paper-button#~0.5.4",
     "core-label": "Polymer/core-label#~0.5.4",
-    "core-item": "Polymer/core-item#~0.5.4"
+    "core-item": "Polymer/core-item#~0.5.4",
+    "core-list": "Polymer/core-list#~0.5.4"
   }
 }

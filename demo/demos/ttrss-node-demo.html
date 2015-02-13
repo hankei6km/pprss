@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>ttrss-node demos</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+      }
+      section {
+        margin: 0px;
+        padding: 24px;
+      }
+      paper-input {
+        width: 80%;
+      }
+      paper-button.colored {
+        color: #4285f4;
+      }
+      paper-button[raised].colored {
+        background: #4285f4;
+        color: #fff;
+      }
+      .item {
+        box-sizing: border-box;
+        height: 60px;
+        border-bottom: 1px solid #ddd;
+        padding: 4px 24px 4px 24px;
+        cursor: default;
+        overflow: hidden;
+      }
+    </style>
+
+    <link rel="import" href="../bower_components/core-item/core-item.html">
+    <link rel="import" href="../bower_components/core-list/core-list.html">
+    <link rel="import" href="../bower_components/paper-input/paper-input.html">
+    <link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+    <script src="../js/libs/ttrss-node.js"></script>
+  </head>
+  <body fullbleed unresolved layout vertical>
+    <template is="auto-binding">
+    <div>
+    <section>
+      <div>
+        <paper-input id="url" label="url" value="{{url}}"></paper-input>
+        <paper-input id="user" label="user" value="{{user}}"></paper-input>
+        <paper-input id="password" label="password" value="{{password}}"></paper-input>
+      </div>
+      <div>
+        <paper-button raised class="colored" on-tap="{{handleOnTap}}">
+          GET ALL HEADLINES
+        </paper-button>
+      </div>
+    </section>
+
+    <section hidden?="{{(errorMsg === '')}}">
+      <core-item icon="error" label="{{errorMsg}}"></core-item>
+    </section>
+    </div>
+
+    <div relative flex>
+      <core-list fit id="feeds" height="60" hidden?="{{hideList}}" data="{{feeds}}">
+        <template>
+          <div class="item">
+            <core-item data-index="{{index}}" label="{{model.title}}"></core-item>
+          </div>
+        </template>
+      </core-list>
+    </div>
+
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      template.ready = function(e){
+        this.client = null;
+        this.feeds = [];
+        this.hideList = false;
+        this.errorMsg = '';
+      };
+      template.handleOnTap = function(e){
+        this.errorMsg = '';
+        this.client = new TTrss(this.url,
+            {user: this.user, password: this.password, auto_login: true});
+        var that = this;
+        this.client.get_headlines(function(err, feeds){
+          if(!err){
+            //console.log(feeds);
+            that.feeds = feeds;
+          }else{
+            console.log(err.message);
+            that.feeds = feeds;
+            that.errorMsg = err.message;
+          }
+          that.$.feeds.clearSelection();
+          that.$.feeds.scrollToItem(0);
+          that.$.feeds.refresh();
+        }); 
+      };
+    </script>
+
+  </body>
+</html>
