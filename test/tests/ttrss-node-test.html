@@ -13,13 +13,102 @@
 <body>
 
   <script>
-    chai.should();
+    //var xhr;
+    //var requests;
+    //before(function(){
+    //  xhr = sinon.useFakeXMLHttpRequest();
+    //  requests = [];
+
+    //  xhr.onCreate = function (xhr) {
+    //    requests.push(xhr);
+    //  };
+    //});
+
+    //after(function(){
+    //  xhr.restore();
+    //});
 
     describe('<ttrss-node>', function() {
 
       it('shuold be done initialize', function() {
-        var client = TTrss('http://local:4000', {user: 'test-user', password :'test-password'});
-        client.should.be.a('Object')
+        var client = TTrss(
+            'http://localhost:4000',
+            {
+              user: 'test-user',
+              password :'test-password'
+            });
+        expect(client).be.a('Object');
+        expect(client).to.have.property('login');
+      });
+
+      it('shuold be done login', function(done) {
+        var client = TTrss(
+            'http://localhost:4000',
+            {
+              user: 'test-user',
+              password :'test-password'
+            });
+
+        var call_api_func = sinon.stub(client, '_call_api_func');
+        call_api_func.callsArgWithAsync(1, null, {content: {session_id: 1234}});
+
+        client.login(function(err, sid){
+          expect(err).equal(null);
+          expect(sid).equal(1234);
+          done();
+        });
+      });
+
+      it('shuold be done receive headlines', function(done) {
+        var client = TTrss(
+            'http://localhost:4000',
+            {
+              user: 'test-user',
+              password :'test-password',
+              auto_login: true
+            });
+
+        var call_api_func = sinon.stub(client, '_call_api_func', function(opts, caller_cb){
+              if(opts.op === 'login'){
+                caller_cb(null, {content: {session_id: 1234}});
+              }else if(opts.op === 'getHeadlines'){
+                caller_cb(null, {content: [{
+                  "title": "headline1_r",
+                  "id": 10,
+                  "unread": false
+                }, {
+                  "title": "headline2_r",
+                  "id": 11,
+                  "unread": false
+                }, {
+                  "title": "headline2_ur",
+                  "id": 12,
+                  "unread": true
+                }, {
+                  "title": "headline1_ur",
+                  "id": 13,
+                  "unread": true
+                }, {
+                  "title": "\x1b[36mCYAN\x1b[39m\n&lt;headline_ur&gt;",
+                  "id": 14,
+                  "unread": true
+                }]});
+              }else{
+                throw(new Error('unknoun op'));
+              }
+            });
+
+        client.get_headlines(function(err, feeds){
+          expect(err).equal(null);
+          expect(feeds).to.have.length.of.at.least(5);
+          expect(feeds).to.have.deep.property('[0].title', 'headline1_r');
+          expect(feeds).to.have.deep.property('[0].id', 10);
+          expect(feeds).to.have.deep.property('[0].unread', false);
+          expect(feeds).to.have.deep.property('[2].title', 'headline2_ur');
+          expect(feeds).to.have.deep.property('[2].id', 12);
+          expect(feeds).to.have.deep.property('[2].unread', true);
+          done();
+        });
       });
 
     });
