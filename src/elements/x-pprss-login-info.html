@@ -1,0 +1,86 @@
+<style>
+  html /deep/ paper-input-decorator {
+    width: 100%;
+  }
+</style>
+<link rel="import" href="../bower_components/paper-dialog/paper-action-dialog.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-input-decorator.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<polymer-element name="x-pprss-login-info" extends="paper-action-dialog" role="dialog" attributes="url user password" on-tap="{{handleLoginInfoTap}}">
+  <script>
+    (function(){
+    var template = document.querySelector('template');
+    var appendHtml =
+    '<paper-button id="btn" affirmative>Login</paper-button>';
+    var urlInput = null;
+    var userInput = null;
+    var passwordInput = null;
+    function createInputDecoratorElement(name, input){
+      var ret = document.createElement('paper-input-decorator');
+      ret.setAttribute('label', name);
+      ret.appendChild(input);
+      return ret;
+    }
+    Polymer('x-pprss-login-info', {
+      url: '',
+      user: '',
+      password: '',
+      ready: function(){
+        this.super();
+      },
+      domReady: function(){
+        // how do append element into extended polymer-element ?
+
+        this.injectBoundHTML(appendHtml, this);  // into `content` ?
+
+        var s = document.createElement('section');
+        var d;
+
+        urlInput = document.createElement('input');
+        this.urlChanged('', this.url);
+        d = createInputDecoratorElement('url', urlInput);
+        s.appendChild(d);
+
+        userInput = document.createElement('input');
+        this.userChanged('', this.user);
+        d = createInputDecoratorElement('user', userInput);
+        s.appendChild(d);
+
+        passwordInput = document.createElement('input');
+        this.passwordChanged('', this.password);
+        passwordInput.setAttribute('type', 'password');
+        d = createInputDecoratorElement('password', passwordInput);
+        s.appendChild(d);
+
+        this.appendChild(s); // into `template` ?
+        
+      },
+      urlChanged: function(oldValue, newValue){
+        if(urlInput){
+          urlInput.setAttribute('value', newValue);
+        }
+      },
+      userChanged: function(oldValue, newValue){
+        if(userInput){
+          userInput.setAttribute('value', newValue);
+        }
+      },
+      passwordChanged: function(oldValue, newValue){
+        if(passwordInput){
+          passwordInput.setAttribute('value', newValue);
+        }
+      },
+      handleLoginInfoTap: function(e){
+        if(e.target.hasAttribute('affirmative')){
+          this.fire('login', {
+            url: urlInput.value,
+            user: userInput.value,
+            password: passwordInput.value
+          });
+        }
+      }
+    });
+    })();
+  </script>
+</polymer-element>

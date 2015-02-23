@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>login info</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        padding: 24px;
+        overflow: hidden;
+      }
+    </style>
+
+    <link rel="import" href="../bower_components/core-item/core-item.html">
+    <link rel="import" href="../elements/x-pprss-login-info.html">
+  </head>
+  <body fullbleed unresolved>
+    <template is="auto-binding" on-template-bound="{{handleTemplateBound}}">
+      <x-pprss-login-info
+        id="loginInfo"
+        class="loginInfo"
+        heading="Login"
+        url="{{url}}"
+        user="{{user}}"
+        password="{{password}}"
+        on-login="{{handleLoginInfoLogin}}"
+      >
+      </x-pprss-login-info>
+      <section>
+        <core-item label="url:{{url}}"></core-item>
+        <core-item label="user:{{user}}"></core-item>
+        <core-item label="password:{{password}}"></core-item>
+      </section>
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      template.url = 'http://localhost:4000';
+      template.user = '';
+      template.password = '';
+      template.handleTemplateBound = function(){
+        this.$.loginInfo.open();
+      };
+      template.handleLoginInfoLogin = function(e){
+        console.log(e.detail);
+        this.url = e.detail.url;
+        this.user = e.detail.user;
+        this.password = e.detail.password;
+      };
+    </script>
+  </body>
+</html>
