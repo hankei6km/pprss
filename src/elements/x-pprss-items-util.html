@@ -1,0 +1,112 @@
+<script src="../bower_components/underscore/underscore-min.js"></script>
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="x-pprss-items-util" attributes="">
+  <script>
+    (function(){
+    "use strict";
+    /*jshint newcap:false */
+
+    function getIndexFrom(items, p, v){
+      var ret = -1;
+      var len = items.length;
+      for(var idx = 0; idx < len; idx++){
+        if(items[idx][p] === v){
+          ret = idx;
+          break;
+        }
+      }
+      return ret;
+    }
+
+    Polymer('x-pprss-items-util', {
+
+      /**
+       * Get index of items array from uid.
+       * @return {number}
+       * @param {array} items
+       * @param {string} uid
+       */
+      getIndexFromUid: function getIndexFromUid(items, uid){
+        return getIndexFrom(items, 'uid', uid);
+      },
+
+      /**
+       * Get index of items array from id.
+       * @return {number}
+       * @param {array} items
+       * @param {string} uid
+       */
+      getIndexFromId: function getIndexFromId(items, id){
+        return getIndexFrom(items, 'id', id);
+      },
+
+      mergeItems: function mergeItems(mast, tran){
+        var mlen = mast.length;
+        var midx;
+        var tlen = tran.length;
+        var tidx;
+        var ret = [];
+
+        if(mlen > 0){
+          for(tidx = 0; tidx < tlen; tidx++){
+            if(mast[0].id == tran[tidx].id){
+              break;
+            }else{
+              ret.push(tran[tidx]);
+            }
+          }
+          for(midx = 0; midx < mlen; midx++){
+            ret.push(mast[midx]);
+            for(; tidx < tlen; tidx++){
+              if(mast[midx].id == tran[tidx].id){
+                ret[ret.length - 1] = tran[tidx];
+                break;
+              }
+            }
+          }
+        }
+
+        return ret;
+      },
+
+      compareByUidAsc: function compareByUidAsc(a, b){
+        if(a.uid == b.uid){
+          return 0;
+        }else if(a.uid < b.uid){
+          return -1;
+        }else{
+          return 1;
+        }
+      },
+
+      updateItemsByUid: function updateItemsByUid(in_mast, in_tran, in_handler){
+        //var mast = _.clone(in_mast).sort(compareByUidAsc);
+        //var tran = _.clone(in_tran).sort(compareByUidAsc);
+        var mast = _.clone(in_mast);
+        var tran = _.clone(in_tran);
+        var handler = _.extend({
+          oncopy: function(ret, ridx, tran, tidx){
+            ret[ridx] = _.clone(tran[tidx]);
+          }
+        }, in_handler || {});
+
+        var mlen = mast.length;
+        var tlen = tran.length;
+        var ret = new Array(mlen);
+
+        for(var midx = 0; midx < mlen; midx++){
+          ret[midx] = mast[midx];
+          for(var tidx = 0; tidx < tlen; tidx++){
+            if(mast[midx].uid == tran[tidx].uid){
+              handler.oncopy(ret, midx, tran, tidx);
+              break;
+            }
+          }
+        }
+
+        return ret;
+      }
+    });
+    })();
+  </script>
+</polymer-element>

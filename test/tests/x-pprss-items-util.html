@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-items-util</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-items-util.html">
+</head>
+<body fullbleed unresolved>
+  <x-pprss-items-util id="util"></x-pprss-items-util>
+
+  <script>
+    describe('<x-pprss-items-util>', function() {
+
+      var itemsUtil = document.querySelector('x-pprss-items-util');
+
+      it("should get index of holder from uid", function() {
+        var items = [{uid: 'cat:1'}, {uid: 'cat:-1'}, {uid: 'cat:-2'}];
+        expect(itemsUtil.getIndexFromUid(items, 'cat:-1')).to.equal(1);
+        expect(itemsUtil.getIndexFromUid(items, 'cat:3')).to.equal(-1);
+      });
+
+      it("should get index of holder from id", function() {
+        var items = [{id: 'cat:1'}, {id: 'cat:-1'}, {id: 'cat:-2'}];
+        expect(itemsUtil.getIndexFromId(items, 'cat:-1')).to.equal(1);
+        expect(itemsUtil.getIndexFromId(items, 'cat:3')).to.equal(-1);
+      });
+
+
+      it("should merge transaction array with master array", function() {
+        var master = [{
+          id: 1,
+          data: 'aaa'
+        }, {
+          id: 2,
+          data: 'bbb'
+        }, {
+          id: 3,
+          data: 'ccc'
+        }, {
+          id: 4,
+          data: 'ddd'
+        }, {
+          id: 5,
+          data: 'eee'
+        }];
+        var transaction= [{
+          id: 0,
+          data: '---'
+        }, {
+          id: 1,
+          data: 'aaa'
+        }, {
+          id: 2,
+          data: 'BBB'
+        }, {
+          id: 3,
+          data: 'ccc'
+        }, {
+          id: 4,
+          data: 'DDD'
+        }, {
+          id: 5,
+          data: 'eee'
+        }, {
+          id: 6,
+          data: 'FFF'
+        }];
+        expect(itemsUtil.mergeItems(master, transaction)).to.deep.equal([{
+          id: 0,
+          data: '---'
+        }, {
+          id: 1,
+          data: 'aaa'
+        }, {
+          id: 2,
+          data: 'BBB'
+        }, {
+          id: 3,
+          data: 'ccc'
+        }, {
+          id: 4,
+          data: 'DDD'
+        }, {
+          id: 5,
+          data: 'eee'
+        }]);
+      });
+
+      it("should update master array with transaction array", function() {
+        var master = [{
+          uid: 4,
+          data: 'ddd'
+        }, {
+          uid: 5,
+          data: 'eee'
+        }, {
+          uid: 3,
+          data: 'ccc'
+        }, {
+          uid: 10,
+          data: '+++'
+        }, {
+          uid: 1,
+          data: 'aaa'
+        }, {
+          uid: 2,
+          data: 'bbb'
+        }];
+        var transaction= [{
+          uid: 2,
+          data: 'BBB',
+          opt: '22'
+        }, {
+          uid: 6,
+          data: 'FFF',
+          opt: '66'
+        }, {
+          uid: 0,
+          data: '---',
+          opt: '00'
+        }, {
+          uid: 5,
+          data: 'eee',
+          opt: '55'
+        }, {
+          uid: 4,
+          data: 'DDD',
+          opt: '44'
+        }, {
+          uid: 3,
+          data: 'ccc',
+          opt: '33'
+        }, {
+          uid: 1,
+          data: 'aaa',
+          opt: '11'
+        }];
+        expect(itemsUtil.updateItemsByUid(master, transaction)).to.deep.equal([{
+          uid: 4,
+          data: 'DDD',
+          opt: '44'
+        }, {
+          uid: 5,
+          data: 'eee',
+          opt: '55'
+        }, {
+          uid: 3,
+          data: 'ccc',
+          opt: '33'
+        }, {
+          uid: 10,
+          data: '+++'
+        }, {
+          uid: 1,
+          data: 'aaa',
+          opt: '11'
+        }, {
+          uid: 2,
+          data: 'BBB',
+          opt: '22'
+        }]);
+        expect(itemsUtil.updateItemsByUid(master, transaction, {
+          oncopy: function(ret, ridx, tran, tidx){
+            ret[ridx].opt = tran[tidx].opt;
+          }
+        })).to.deep.equal([{
+          uid: 4,
+          data: 'ddd',
+          opt: '44'
+        }, {
+          uid: 5,
+          data: 'eee',
+          opt: '55'
+        }, {
+          uid: 3,
+          data: 'ccc',
+          opt: '33'
+        }, {
+          uid: 10,
+          data: '+++'
+        }, {
+          uid: 1,
+          data: 'aaa',
+          opt: '11'
+        }, {
+          uid: 2,
+          data: 'bbb',
+          opt: '22'
+        }]);
+      });
+
+    });
+  </script>
+
+</body>
+</html>
