@@ -82,4 +82,8 @@ config.demoFiles = [
   config.demoGlobJs
 ];
 
+config.addCustomBundle = function(file){
+  config.srcFiles = config.srcFiles.concat('!' + '.' + path.sep + path.join(config.src, file));
+};
+
 module.exports = config;

@@ -70,7 +70,8 @@ gulp.task('reload', function() {
   browserSync.reload();
 });
 gulp.task('watch', ['lint', 'copy', 'js', 'ttrss-node', 'browser-sync'], function(){
-  gulp.watch(config.srcFiles, ['copy', 'ttrss-node']);
+  gulp.watch(config.srcFiles, ['copy']);
+  gulp.watch(ttrssFile, ['ttrss-node']);
   gulp.watch(config.lintFiles , ['lint']);
   gulp.watch(config.destFiles, ['reload']);
 });
@@ -87,7 +88,8 @@ gulp.task('browser-sync:demo', function() {
   });
 });
 gulp.task('watch:demo', ['lint', 'copy', 'js', 'ttrss-node', 'browser-sync:demo'], function(){
-  gulp.watch(config.srcFiles, ['copy', 'ttrss-node']);
+  gulp.watch(config.srcFiles, ['copy']);
+  gulp.watch(ttrssFile, ['ttrss-node']);
   gulp.watch(config.lintFiles , ['lint']);
   gulp.watch(config.demoFiles, ['reload']);
 });
@@ -101,10 +103,12 @@ gulp.task('watch:test', ['watch:demo'], function(){
 // ----------------
 // ttrss-node
 // ----------------
+var ttrssFile =  'js/libs/ttrss-node.js';
+config.addCustomBundle(ttrssFile);
 gulp.task('ttrss-node', function() {
-  return browserify('.' + path.sep + path.join(config.src, 'js/libs/ttrss-node.js'), {standalone: 'TTrss'})
+  return browserify('.' + path.sep + path.join(config.src,ttrssFile), {standalone: 'TTrss'})
     .bundle()
-    .pipe(source('js/libs/ttrss-node.js'))
+    .pipe(source(ttrssFile))
     // optional, remove if you dont want sourcemaps
       .pipe(buffer())
       .pipe(sourcemaps.init({loadMaps: true})) // loads map from browserify file
