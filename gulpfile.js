@@ -1,7 +1,9 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
+var cached = require('gulp-cached');
 
 var path = require('path');
+var _ = require('underscore');
 
 var config = require('./taskconfig.js');
 
@@ -34,7 +36,6 @@ function bundle() {
 
 
 var jshint = require('gulp-jshint');
-//var cached = require('gulp-cached');
 
 gulp.task('lint', function() {
   return gulp.src(config.lintFiles, {base: config.src})
@@ -45,11 +46,12 @@ gulp.task('lint', function() {
 });
 
 
-var changed = require('gulp-changed');
+//var changed = require('gulp-changed');
 
 gulp.task('copy', function() {
   return gulp.src(config.srcFiles, {base: config.src})
-    .pipe(changed(config.dest))
+    .pipe(cached('copy'))
+    //.pipe(changed(config.dest))
     .pipe(gulp.dest(config.dest));
 });
 
@@ -66,8 +68,11 @@ gulp.task('browser-sync', function() {
     }
   });
 });
-gulp.task('reload', function() {
+var debReload = _.debounce(function(){
   browserSync.reload();
+}, 1000);
+gulp.task('reload', function() {
+  debReload();
 });
 gulp.task('watch', ['lint', 'copy', 'js', 'ttrss-node', 'browser-sync'], function(){
   gulp.watch(config.srcFiles, ['copy']);
