@@ -99,9 +99,17 @@ gulp.task('watch:demo', ['lint', 'copy', 'js', 'ttrss-node', 'browser-sync:demo'
   gulp.watch(config.demoFiles, ['reload']);
 });
 
-require('web-component-tester').gulp.init(gulp);
-gulp.task('watch:test', ['watch:demo'], function(){
-  gulp.watch(config.testFiles, ['test:local']);
+// "test:reload" task require selenum server for local that run by `wct -p --webserver-port 5000`.
+var webdriver = require('selenium-webdriver');
+var driver;
+gulp.task('test:local', function() {
+  driver = new webdriver.Builder().forBrowser('chrome').build();
+});
+gulp.task('test:reload', function() {
+  driver.get('http://localhost:5000/pprss/test/index.html?cli_browser_id=0');
+});
+gulp.task('watch:test', ['watch:demo', 'test:local'], function(){
+  gulp.watch(config.testFiles, ['test:reload']);
 });
 
 
