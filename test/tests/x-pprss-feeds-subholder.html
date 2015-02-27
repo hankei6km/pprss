@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-feeds-subholder</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-feeds-subholder.html">
+</head>
+<body fullbleed unresolved>
+  <x-pprss-feeds-subholder>
+  </x-pprss-feeds-subholder>
+
+  <script>
+    describe('<x-pprss-feeds-subholder>', function() {
+
+      var items = [
+        {
+          title: 'cat1',
+          uid: 'cat1'
+        },{
+          title: 'feed 1-1',
+          uid: 'feed:1-1'
+        },{
+          title: 'feed 1-2',
+          uid: 'feed:1-2'
+        },{
+          title: 'feed 1-3',
+          uid: 'feed:1-3'
+        }
+      ];
+      var feedsSubholder = document.querySelector('x-pprss-feeds-subholder');
+
+      it('should set `cat` and `feeds` via `itemsChanged`', function(done) {
+        /* jshint expr:true */
+        expect(feedsSubholder.catItem).to.be.empty;
+        expect(feedsSubholder.feedItems).to.be.empty;
+
+        var co = feedsSubholder.itemsChanged.bind(feedsSubholder); 
+        sinon.stub(feedsSubholder, 'itemsChanged', function(oldValue, newValue){
+          co(oldValue, newValue);
+          expect(feedsSubholder.catItem).to.be.deep.equal({
+            title: 'cat1',
+            uid: 'cat1'
+          });
+          done();
+        });
+        feedsSubholder.items = items; // `???Changed` is asynchronous method ?
+      });
+
+      it('should be receive `select` event', function(done) {
+        feedsSubholder.addEventListener('select', function(e){ 
+          expect(e.detail).be.a('Object');
+          expect(e.detail).to.have.property('item');
+          expect(e.detail.item).to.have.property('title', 'feed 1-2');
+          expect(e.detail.item).to.have.property('uid', 'feed:1-2');
+          done();
+        });
+        feedsSubholder.items = items;
+        var cb =  sinon.stub();
+        cb.withArgs('data').returns('feed:1-2');
+        feedsSubholder.handleItemSelect({
+          detail: {
+            isSelected: true,
+            item: {
+              getAttribute: cb
+            }
+          }
+        });
+      });
+
+    });
+  </script>
+
+</body>
+</html>

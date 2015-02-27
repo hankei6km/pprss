@@ -25,6 +25,8 @@
     "core-label": "Polymer/core-label#~0.5.4",
     "core-item": "Polymer/core-item#~0.5.4",
     "core-list": "Polymer/core-list#~0.5.4",
-    "paper-dialog": "Polymer/paper-dialog#~0.5.5"
+    "paper-dialog": "Polymer/paper-dialog#~0.5.5",
+    "underscore": "~1.8.2",
+    "async": "~0.9.2"
   }
 }

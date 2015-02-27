@@ -1,0 +1,82 @@
+<link rel="import" href="../bower_components/core-item/core-item.html">
+<link rel="import" href="../bower_components/core-menu/core-menu.html">
+<link rel="import" href="../bower_components/core-collapse/core-collapse.html">
+<link rel="import" href="x-pprss-items-util.html">
+<polymer-element name="x-pprss-feeds-subholder" attributes="items active opened">
+  <template>
+  <div horizontal layout>
+    <core-item id="expander" icon="{{opened ? 'expand-less' : 'expand-more'}}" on-tap="{{handleToggleTap}}">
+    </core-item><core-item id="label" label="{{catItem.title}}" class="{{labelClass}}" flex on-tap="{{handleLabelTap}}"></core-item>
+  </div>
+  <core-collapse id="subitems" opened=false on-core-resize="{{handleResize}}">
+    <core-menu id="menu" theme="core-light-theme" selected="-1" on-core-select="{{handleItemSelect}}">
+      <template repeat="{{feedItem in feedItems}}">
+        <core-item data="{{feedItem.uid}}" label="{{feedItem.title}}"></core-item>
+      </template>
+    </core-menu>
+  </core-collapse>
+  <x-pprss-items-util id="itemsUtil"></x-pprss-items-util>
+  </template>
+  <script>
+    (function(){
+    var template = document.querySelector('template');
+    Polymer('x-pprss-feeds-subholder', {
+      items: [],
+      catItem: {},
+      feedItems: [],
+      active: false,
+      opened: false,
+      labelClass: '',
+      ready: function(){
+      },
+      domReady: function(){
+      },
+      handleToggleTap: function(e){
+        this.$.subitems.toggle();
+        this.opened = !(this.opened);
+        // TODO: stop to select item.
+        e.preventDefault();
+      },
+      handleLabelTap: function(e){
+        this.labelClass = 'core-selected';
+        this.$.menu.selected = -1;
+        this.fire('select', {
+          item: this.items[0]
+        });
+      },
+      handleResize: function(e){
+        this.opened = this.$.subitems.opened;
+      },
+      handleItemSelect: function(e){
+        if(e.detail.isSelected){
+          this.labelClass = '';
+          var idx =
+            this.$.itemsUtil.getIndexFromUid(this.items, e.detail.item.getAttribute('data'));
+          if(idx > 0){
+            this.fire('select', {
+              item: this.items[idx]
+            });
+          }
+        }
+      },
+      activeChanged: function(oldValue, newValue){
+        if(newValue){
+        }else{
+          this.labelClass = '';
+          this.$.menu.selected = -1;
+          this.$.subitems.opened = false;
+        }
+      },
+      itemsChanged: function(oldValue, newValue){
+        if(newValue && newValue.length > 0){
+          this.catItem = newValue[0];
+          this.feedItems = newValue.slice(1);
+        }else{
+          this.catItem = {};
+          this.feedItems = [];
+        }
+      }
+    });
+    })();
+  </script>
+</polymer-element>
