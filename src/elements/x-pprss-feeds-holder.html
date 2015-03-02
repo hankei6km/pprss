@@ -1,0 +1,232 @@
+<script src="../bower_components/async/lib/async.js"></script>
+<script src="../bower_components/underscore/underscore-min.js"></script>
+<link rel="import" href="x-pprss-feeds-subholder.html">
+<link rel="import" href="x-pprss-items-util.html">
+<polymer-element name="x-pprss-feeds-holder" attributes="client">
+ <template>
+    <core-menu theme="core-light-theme" selected="-1" itemsSelector="x-pprss-feeds-subholder">
+      <template repeat="{{catGroup in catGroups}}">
+        <x-pprss-feeds-subholder items="{{catGroup}}" on-select="{{handleItemSelect}}">
+        </x-pprss-feeds-subholder>
+      </template>
+    </core-menu>
+  <x-pprss-items-util id="itemsUtil"></x-pprss-items-util>
+  </template>
+  <script>
+    (function(){
+
+    function makeItem(client, in_opts){
+      var opts = {
+        title: '',
+        id: 0,
+        kind: '', // cat, label, feed
+        depth: 0,
+          //uid: '', // i.e `cat:0`
+        has_child: true,
+        parent_uid: '',
+        expanded: false,
+        unread: 0
+      };
+      _.extend(opts, in_opts);
+      opts.uid = opts.kind + ':' + opts.id;
+      //opts.headlines_list = new HeadlinesList(client, opts);
+
+      return opts;
+    }
+
+    Polymer('x-pprss-feeds-holder', {
+      ready: function(){
+      },
+      domReady: function(){
+      },
+      client: {},
+      catGroups: [],
+      items: [],
+      cat_items: [],
+      feed_items: [],
+      selected: '',
+
+      handleItemSelect: function(e){
+        var idx =
+          this.$.itemsUtil.getIndexFromUid(this.items, e.detail.uid);
+        if(idx > 0){
+          this.selected = this.items[idx];
+          this.fire('select', {
+            item: this.items[idx]
+          });
+        }
+      },
+
+      clientChanged: function(oldValue, newValue){
+        if(newValue){
+          this.fetchItems(function(err, items){
+          });
+        }
+      },
+
+      // catGroupsChanged: function(oldValue, newValue){
+      // },
+
+      itemsChanged: function(oldValue, newValue){
+        this.fire('items-changed', {
+          items: this.items
+        });
+      },
+
+      fetchItems: function(caller_cb){
+        var that = this;
+        var cat_items;
+        var feed_items;
+        var req_cat = null;
+        var req_feed = null;
+        var aborted = false;
+
+        async.parallel([function(cb){
+          // TODO: Support enable_nested?
+          req_cat = that.client.get_categories({enable_nested: false}, function(err, cat){
+            req_cat = null;
+            if(!err){
+              cat_items = that.buildCatItems(cat);
+            }
+            cb(err);
+          });
+        }, function(cb){
+          req_feed = that.client.get_feeds({cat_id: -4}, function(err, feed){
+            req_feed = null;
+            if(!err){
+              feed_items = that.buildFeedItems(feed);
+            }
+            cb(err);
+          });
+        }],
+        function(err, res){
+          if(!aborted){
+            if(!err){
+              //that.buildItems(cat_items, feed_items);
+              //that.extractItems();
+              that.buildCatGroups(cat_items, feed_items);
+            }
+            caller_cb(err, that.items);
+          }else{
+            caller_cb(new Error('abort'));
+          }
+        });
+
+        return {
+          abort: function(){
+            aborted = true;
+            if(req_cat !== null){
+              req_cat.abort();
+            }
+            if(req_feed !== null){
+              req_feed.abort();
+            }
+          }
+        };
+      },
+
+      buildCatItems: function(cat){
+        cat.sort(function(a, b){
+          var oia = typeof(a.order_id) != 'undefined';
+          var oib = typeof(b.order_id) != 'undefined';
+
+          if(oia && oib){
+            return a.order_id - b.order_id;
+          }else if(oia){
+            return 1;
+          }else if(oib){
+            return -1;
+          }else{
+            return b.id - a.id;
+          }
+        });
+        var uncat = cat.shift();
+        cat.push(uncat);
+
+        var that = this;
+        var cat_items = cat.map(function(item){
+          return makeItem(that.client, {
+            title: item.title,
+            id: item.id,
+            kind: 'cat',
+            unread: item.unread
+          });
+        });
+        cat_items[0].expanded = true;
+
+        return cat_items;
+      },
+
+      buildFeedItems: function(feed){
+        var that = this;
+
+        feed.sort(function(a, b){
+          var oia = typeof(a.order_id) != 'undefined';
+          var oib = typeof(b.order_id) != 'undefined';
+
+          if(oia && oib){
+            return a.order_id - b.order_id;
+          }else if(oia){
+            return 1;
+          }else if(oib){
+            return -1;
+          }else{
+            return b.id - a.id;
+          }
+        });
+        var feed_items = feed.map(function(item){
+          return makeItem(that.client, {
+            title: item.title,
+            id: item.id,
+            cat_id: item.cat_id,
+            kind: 'feed',
+            depth: 1,
+            has_child: false,
+            unread: item.unread
+          });
+        });
+
+        return feed_items;
+      },
+
+      buildCatGroups: function(cat_items, feed_items){
+        var that = this;
+
+        this.items = cat_items.concat(feed_items);
+
+        var special_items = feed_items.filter(function(item){
+          return item.cat_id === -1;
+        });
+        feed_items = feed_items.filter(function(item){
+          return item.cat_id !== -1;
+        });
+
+        var clen = cat_items.length;
+        var eachIte = function(parent_uid){
+          return function(item){
+            item.parent_uid = parent_uid;
+          };
+        };
+
+        this.catGroups = new Array(clen);
+        special_items.forEach(eachIte(cat_items[0].uid));
+        this.catGroups[0] = [cat_items[0]].concat(special_items);
+
+        var filterIte = function(cat_id){
+          return function(item){
+            return item.cat_id == cat_id; 
+          };
+        };
+        for(var idx=1; idx < clen; idx++){
+          var cat_id = cat_items[idx].id;
+          var items = feed_items.filter(filterIte(cat_id));
+          var parent_uid = cat_items[idx].uid;
+          items.forEach(eachIte(parent_uid));
+          this.catGroups[idx] = [cat_items[idx]].concat(items);
+        }
+      }
+
+    });
+    })();
+  </script>
+</polymer-element>

@@ -54,9 +54,8 @@
       it('should be receive `select` event', function(done) {
         feedsSubholder.addEventListener('select', function(e){ 
           expect(e.detail).be.a('Object');
-          expect(e.detail).to.have.property('item');
-          expect(e.detail.item).to.have.property('title', 'feed 1-2');
-          expect(e.detail.item).to.have.property('uid', 'feed:1-2');
+          expect(e.detail).to.have.property('uid');
+          expect(e.detail.uid).to.equal('feed:1-2');
           done();
         });
         feedsSubholder.items = items;

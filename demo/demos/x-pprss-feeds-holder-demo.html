@@ -13,93 +13,50 @@
       }
     </style>
 
+    <script src="../js/libs/ttrss-node.js"></script>
+
     <link rel="import" href="../bower_components/core-scaffold/core-scaffold.html">
     <link rel="import" href="../bower_components/core-item/core-item.html">
-    <link rel="import" href="../bower_components/core-menu/core-menu.html">
-    <link rel="import" href="../bower_components/core-menu/core-submenu.html">
-    <link rel="import" href="../bower_components/core-collapse/core-collapse.html">
+    <link rel="import" href="../elements/x-pprss-login-info.html">
     <link rel="import" href="../elements/x-pprss-feeds-holder.html">
-    <link rel="import" href="../elements/x-pprss-feeds-subholder.html">
   </head>
   <body fullbleed unresolved>
     <template is="auto-binding" on-template-bound="{{handleTemplateBound}}">
+      <x-pprss-login-info
+        id="loginInfo"
+        class="loginInfo"
+        heading="Login Info"
+        on-login="{{handleLoginInfoLogin}}"
+      >
+      </x-pprss-login-info>
       <core-scaffold>
         <core-header-panel navigation flex mode="seamed">
           <core-toolbar>Application</core-toolbar>
-          <core-menu theme="core-light-theme" selected="0" itemsSelector="x-pprss-feeds-subholder">
-            <x-pprss-feeds-subholder items="{{items1}}" on-select="{{handleItemSelect}}">
-            </x-pprss-feeds-subholder>
-            <x-pprss-feeds-subholder items="{{items2}}" on-select="{{handleItemSelect}}">
-            </x-pprss-feeds-subholder>
-            <x-pprss-feeds-subholder items="{{items3}}" on-select="{{handleItemSelect}}">
-            </x-pprss-feeds-subholder>
-          </core-menu>
+          <x-pprss-feeds-holder client="{{client}}" on-items-changed="{{handleItemsChanged}}" on-select="{{handleItemSelect}}">
+          </x-pprss-feeds-holder>
         </core-header-panel>
         <div tool>Title</div>
-        <div>Main content goes here...</div>
+        <core-item label="id:{{item.id}}"></core-item>
+        <core-item label="kind:{{item.kind}}"></core-item>
+        <core-item label="title:{{item.title}}"></core-item>
       </core-scaffold>
     </template>
 
     <script>
       var template = document.querySelector('template[is=auto-binding]');
-      template.feeds = new Array(100);
-      //(function(){
-      //  for(var i=0; i<100; i++){
-      //    template.feeds[i] = {
-      //      title: 'test' + i
-      //    }
-      //  }
-      //})();
-      template.items1 = [
-        {
-          title: 'cat1',
-          uid: 'cat1'
-        },{
-          title: 'feed 1-1',
-          uid: 'feed:1-1'
-        },{
-          title: 'feed 1-2',
-          uid: 'feed:1-2'
-        },{
-          title: 'feed 1-3',
-          uid: 'feed:1-3'
-        }
-      ]
-      template.items2 = [
-        {
-          title: 'cat2',
-          uid: 'cat2'
-        },{
-          title: 'feed 2-1',
-          uid: 'feed:2-1'
-        },{
-          title: 'feed 2-2',
-          uid: 'feed:2-2'
-        },{
-          title: 'feed 2-3',
-          uid: 'feed:2-3'
-        }
-      ]
-      template.items3 = [
-        {
-          title: 'cat3',
-          uid: 'cat3'
-        },{
-          title: 'feed 3-1',
-          uid: 'feed:3-1'
-        },{
-          title: 'feed 3-2',
-          uid: 'feed:3-2'
-        },{
-          title: 'feed 3-3',
-          uid: 'feed:3-3'
-        }
-      ]
-      template.handletap = function(e){
-        template.$.sub1.toggle();
-      }
+      template.client = null;
+      template.handleTemplateBound = function(){
+        this.$.loginInfo.open(); 
+      };
+      template.handleLoginInfoLogin = function(e){
+        this.client = new TTrss(e.detail.url,
+            {user: e.detail.user, password: e.detail.password, auto_login: true});
+      };
+      template.handleItemsChanged = function(e){
+        console.log(e.detail.items);
+      };
       template.handleItemSelect = function(e){
-        console.log(e.detail.item);
+        this.item = e.detail.item;
       }
     </script>
   </body>
