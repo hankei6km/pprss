@@ -1,0 +1,57 @@
+<link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../bower_components/core-item/core-item.html">
+<polymer-element name="x-pprss-article" attributes="article">
+  <template>
+  <style>
+    .articleTitle {
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .articleTitle core-item /deep/ #label { /* dependent structure of core-item. */
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .feedTitle {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 30%;
+      font-size: 0.7em;
+    }
+    .article {
+      min-height:0.5em;
+      padding:10px;
+    }
+  </style>
+  <core-toolbar>
+    <div class="articleTitle" flex>
+      <core-item label="{{article.title}}">
+        <a href="{{article.link}}" title="{{article.title}}"></a>
+      </core-item>
+    </div>
+    <div class="feedTitle">{{article.feed_title}}</div>
+  </core-toolbar>
+  <div class="article"id="article">
+  </div>
+  </template>
+  <script>
+    (function(){
+    Polymer('x-pprss-article', {
+      article: {content: ''},
+      ready: function(){
+      },
+      domReady: function(){
+        this.$.article.innerHTML = this.article.content;
+      },
+      articleChanged: function(oldValue, newValue){
+        if(newValue){
+          this.$.article.innerHTML = newValue.content;
+        }
+      }
+    });
+    })();
+  </script>
+</polymer-element>

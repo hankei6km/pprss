@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>article</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="../bower_components/paper-input/paper-input-decorator.html">
+    <link rel="import" href="../bower_components/paper-input/paper-autogrow-textarea.html">
+    <script src="../bower_components/underscore/underscore-min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        padding: 24px;
+        overflow: hidden;
+      }
+    </style>
+
+    <link rel="import" href="../elements/x-pprss-article.html">
+  </head>
+  <body fullbleed unresolved>
+    <template is="auto-binding" on-template-bound="{{handleTemplateBound}}">
+      <paper-input-decorator label="Enter the html code here.">
+        <paper-autogrow-textarea>
+          <textarea autofocus=true on-keyup="{{handleKeyup}}"></textarea>
+        </paper-autogrow-textarea>
+      </paper-input-decorator>
+      <x-pprss-article article="{{article}}">
+      </x-pprss-article>
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      template.text = '';
+      template.article = {
+        title: 'article demo',
+        link: '../index_demo.html',
+        content: ''
+      };
+      template.handleKeyup = function(e){
+        var article = _.extend({},template.article);
+        article.content = e.srcElement.value;
+        template.article = article;
+      }; 
+    </script>
+  </body>
+</html>

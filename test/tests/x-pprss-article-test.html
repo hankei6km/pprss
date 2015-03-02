@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-article</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-article.html">
+</head>
+<body fullbleed unresolved>
+  <x-pprss-article>
+  </x-pprss-article>
+
+  <script>
+    describe('<x-pprss-article>', function() {
+
+      var article = document.querySelector('x-pprss-article');
+
+      it('should be set html', function(done) {
+        var html = 'set<br>value{{article}}';
+        var text = 'set\nvalue{{article}}';
+        var co = article.articleChanged.bind(article);
+        sinon.stub(article, 'articleChanged', function(oldValue, newValue){
+          co(oldValue, newValue);
+          this.async(function(){
+            expect(this.$.article.innerHTML).to.equal(html);
+            expect(this.$.article.innerText).to.equal(text);
+            done();
+          });
+        });
+        article.article = {content: html};
+      });
+
+    });
+  </script>
+
+</body>
+</html>
