@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>article list</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+      }
+    </style>
+
+    <script src="../js/libs/ttrss-node.js"></script>
+
+    <link rel="import" href="../bower_components/core-scaffold/core-scaffold.html">
+    <link rel="import" href="../bower_components/core-item/core-item.html">
+    <link rel="import" href="../elements/x-pprss-login-info.html">
+    <link rel="import" href="../elements/x-pprss-articles-list.html">
+  </head>
+  <body fullbleed unresolved>
+    <template is="auto-binding" on-template-bound="{{handleTemplateBound}}">
+      <x-pprss-login-info
+        id="loginInfo"
+        class="loginInfo"
+        heading="Login Info"
+        on-login="{{handleLoginInfoLogin}}"
+      >
+      </x-pprss-login-info>
+      <core-scaffold>
+        <core-header-panel navigation flex mode="seamed">
+          <core-toolbar>Application</core-toolbar>
+        </core-header-panel>
+        <div tool>Title</div>
+        <x-pprss-articles-list id="articles" articles="{{articles}}" holderItem="{{holderItem}}">
+        </x-pprss-articles-list>
+      </core-scaffold>
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      template.client = null;
+      template.handleTemplateBound = function(){
+        this.$.loginInfo.open(); 
+      };
+      template.handleLoginInfoLogin = function(e){
+        this.client = new TTrss(e.detail.url,
+            {user: e.detail.user, password: e.detail.password, auto_login: true});
+        this.$.articles.client = this.client;
+        this.$.articles.holderItem = {
+          "id": -4,
+          "title": "All articles",
+          "unread": 0,
+          "cat_id": -1
+        };
+      };
+      template.handleItemsChanged = function(e){
+        console.log(e.detail.items);
+      };
+      template.handleItemSelect = function(e){
+        this.item = e.detail.item;
+      };
+      template.articles = [];
+    </script>
+  </body>
+</html>

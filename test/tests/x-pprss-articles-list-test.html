@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-articles-list</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-articles-list.html">
+</head>
+<body fullbleed unresolved>
+  <x-pprss-articles-list>
+  </x-pprss-articles-list>
+
+  <script>
+    describe('<x-pprss-articles-list>', function() {
+
+      var articlesList = document.querySelector('x-pprss-articles-list');
+
+      it('should be receive `items-changed` event', function(done) {
+        var client = {get_headlines: function(){}};
+        var get_headlines = sinon.stub(client, 'get_headlines');
+        get_headlines.callsArgWithAsync(1, null, []);
+        articlesList.client = client;
+
+        var func = function(e){
+          expect(get_headlines.getCall(0).args[0]).to.deep.equal({
+            feed_id: -4,
+            is_cat: false,
+            show_excerpt: false,
+            show_content: true,
+            include_attachments: true,
+            view_mode: 'all_articles'
+          });
+          expect(e.detail).be.a('Object');
+          expect(e.detail.err).to.equal(null);
+          expect(e.detail.items).be.a('Array');
+          articlesList.removeEventListener('items-changed', func);
+          done();
+        };
+        articlesList.addEventListener('items-changed', func);
+
+        articlesList.holderItem = {
+          "id": -4,
+          "title": "All articles",
+          "unread": 0,
+          "cat_id": -1
+        };
+      });
+
+      it('should be fetch items that is unread', function(done) {
+        var client = {get_headlines: function(){}};
+        var get_headlines = sinon.stub(client, 'get_headlines');
+        get_headlines.callsArgWithAsync(1, null, []);
+        articlesList.client = client;
+
+        var func = function(e){
+          expect(get_headlines.getCall(0).args[0].view_mode).to.deep.equal('unread');
+          articlesList.removeEventListener('items-changed', func);
+          done();
+        };
+        articlesList.addEventListener('items-changed', func);
+
+        articlesList.holderItem = {
+          "unread": 1
+        };
+      });
+
+    });
+  </script>
+
+</body>
+</html>

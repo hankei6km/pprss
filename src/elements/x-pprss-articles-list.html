@@ -1,0 +1,62 @@
+<link rel="import" href="../bower_components/core-list/core-list.html">
+<link rel="import" href="x-pprss-article.html">
+<polymer-element name="x-pprss-articles-list" attributes="articles client holderItem">
+  <template>
+  <core-list fit id="articles" data="{{articles}}">
+    <template>
+    <x-pprss-article data-index="{{index}}" article="{{model}}">
+      </x-pprss-article>
+    </template>
+  </core-list>
+  </template>
+  <script>
+    (function(){
+    function makeItem(client, holder_item, item){
+      item.uid = holder_item.uid + '/' + item.id;
+      //item.article = new Article(client, item);
+
+      return item;
+    }
+
+    Polymer('x-pprss-articles-list', {
+      articles: [],
+      client: {},
+      holderItem: {},
+      ready: function(){
+      },
+      domReady: function(){
+      },
+      holderItemChanged: function(oldValue, newValue){
+        if(this.client && newValue){
+          var that = this;
+          this.fetchItems(function(err, items){
+          });
+        }
+      },
+      fetchItems: function(caller_cb){
+        var that = this;
+        this.client.get_headlines({
+          feed_id: this.holderItem.id,
+          is_cat: this.holderItem.kind == 'cat',
+          show_excerpt: false,
+          show_content: true,
+          include_attachments: true,
+          view_mode: this.holderItem.unread > 0 ? 'unread' : 'all_articles'},
+          function(err, headlines){
+            if(!err){
+              that.items = headlines;
+              var len = that.items.length;
+              for(var idx = 0; idx < len; idx++){
+                that.items[idx] = makeItem(that.client, that.holderItem, that.items[idx]);
+              }
+            }
+            caller_cb(err, that.items);
+            that.articles = that.items;
+            that.fire('items-changed', {err: err, items: that.items});
+          }
+        );
+      }
+    });
+    })();
+  </script>
+</polymer-element>
