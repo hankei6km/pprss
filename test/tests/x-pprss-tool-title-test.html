@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-article</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-tool-title.html">
+</head>
+<body fullbleed unresolved>
+  <x-pprss-tool-title>
+  </x-pprss-tool-title>
+
+  <script>
+    describe('<x-pprss-tool-title>', function() {
+
+      var toolTitle = document.querySelector('x-pprss-tool-title');
+
+      it('should be receive `mark-as-read` event', function(done) {
+        toolTitle.holderItem = {title: 'test'};
+        var func = function(e){
+          expect(e.detail).be.a('Object');
+          expect(e.detail.holderItem).be.a('Object');
+          expect(e.detail.holderItem).to.have.property('title', 'test');
+          toolTitle.removeEventListener('mark-as-read', func);
+          done();
+        };
+        toolTitle.addEventListener('mark-as-read', func);
+
+        toolTitle.handleMarkAsRead();
+      });
+
+      it('should be update hidden status.', function() {
+        /* jshint expr:true */
+        expect(toolTitle.progressHidden).to.be.true;
+        toolTitle.progressStart();
+        expect(toolTitle.progressHidden).to.be.false;
+        toolTitle.progressStart();
+        expect(toolTitle.progressHidden).to.be.false;
+        toolTitle.progressComplete();
+        expect(toolTitle.progressHidden).to.be.false;
+        toolTitle.progressComplete();
+        expect(toolTitle.progressHidden).to.be.true;
+      });
+    });
+  </script>
+
+</body>
+</html>

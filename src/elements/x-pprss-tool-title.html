@@ -1,0 +1,73 @@
+<link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="../bower_components/core-icon-button/core-icon-button.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<polymer-element name="x-pprss-tool-title" attributes="holderItem">
+  <template>
+  <style>
+    .holderTitle {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    core-toolbar {
+      background-color: transparent;
+    }
+    
+    paper-progress {
+      display: block;
+      width: 100%;
+      margin: 0px -50px 0px -25px;
+    }
+    paper-progress::shadow #activeProgress {
+      background-color: #aaaaff;
+    }
+    paper-progress::shadow #progressContainer {
+      background-color: transparent;
+    }
+    
+  </style>
+  <core-toolbar flex fit>
+    <span flex class="holderTitle">{{holderItem.title}}</span>
+    <core-icon-button
+      icon="done"
+      title="Mark as read"
+      on-tap="{{handleMarkAsRead}}"
+      >
+    </core-icon-button>
+    <paper-progress
+      id="progress"
+      class="bottom fit"
+      indeterminate
+      hidden?="{{progressHidden}}"
+      >
+    </paper-progress>
+  </core-toolbar>
+  </template>
+  <script>
+    (function(){
+    var progressCnt = 0;
+    Polymer('x-pprss-tool-title', {
+      holderItem: {},
+      ready: function(){
+      },
+      domReady: function(){
+      },
+      progressHidden: true,
+      updateProgressHidden: function(){
+        this.progressHidden = progressCnt <=0;
+      },
+      progressStart: function(){
+        progressCnt++;
+        this.updateProgressHidden();
+      },
+      progressComplete: function(){
+        progressCnt--;
+        this.updateProgressHidden();
+      },
+      handleMarkAsRead: function(e){
+        this.fire('mark-as-read', {holderItem: this.holderItem});
+      }
+    });
+    })();
+  </script>
+</polymer-element>

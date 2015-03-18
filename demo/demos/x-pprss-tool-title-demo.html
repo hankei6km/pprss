@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>tool title</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        padding: 24px;
+        overflow: hidden;
+      }
+    </style>
+
+    <link rel="import" href="../bower_components/core-scaffold/core-scaffold.html">
+    <link rel="import" href="../bower_components/core-item/core-item.html">
+    <link rel="import" href="../bower_components/paper-button/paper-button.html">
+    <link rel="import" href="../elements/x-pprss-tool-title.html">
+  </head>
+  <body fullbleed unresolved>
+    <template is="auto-binding" on-template-bound="{{handleTemplateBound}}">
+      <core-scaffold>
+        <core-header-panel navigation flex mode="seamed">
+          <core-toolbar>Application</core-toolbar>
+        </core-header-panel>
+        <div flex tool>
+          <x-pprss-tool-title id="toolTitle" holderItem="{{holderItem}}" on-mark-as-read="{{handleMarkAsRead}}">
+          </x-pprss-tool-title>
+        </div>
+        <div>
+          <div layout horizontal>
+            <paper-button raised on-tap="{{handleTap}}">
+              trigger
+            </paper-button>
+            <core-item label="{{'cnt: ' + cnt}}"></core-item>
+          </div>
+          <div>
+            <core-item label="{{'Mark as read:' + mtitle}}" hidden?="{{!mtitle}}" ></core-item>
+          </div>
+        </div>
+      </core-scaffold>
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      template.holderItem = {
+        title: 'tool-title demo',
+      };
+      template.cnt = 0;
+      template.mtitle = '';
+      template.handleTap = function(e){
+        this.$.toolTitle.progressStart();
+        this.cnt++;
+        setTimeout(function(){
+          template.$.toolTitle.progressComplete();
+          template.cnt--;
+        }, 1000 * 3);
+      };
+      template.handleMarkAsRead = function(e){
+        this.mtitle = e.detail.holderItem.title;
+      };
+    </script>
+  </body>
+</html>
