@@ -11,7 +11,9 @@
   </style>
   <div horizontal layout>
     <core-item id="expander" icon="{{opened ? 'expand-less' : 'expand-more'}}" on-tap="{{handleToggleTap}}">
-    </core-item><core-item id="label" label="{{catItem.title}}" class="{{labelClass}}" flex on-tap="{{handleLabelTap}}"></core-item>
+    </core-item>
+    <core-item id="label" label="{{catItem.title}}" class="{{labelClass}}" flex on-tap="{{handleLabelTap}}">
+    </core-item>
   </div>
   <core-collapse id="subitems" opened=false on-core-resize="{{handleResize}}">
     <core-menu id="menu" theme="core-light-theme" selected="-1" on-core-select="{{handleItemSelect}}">
