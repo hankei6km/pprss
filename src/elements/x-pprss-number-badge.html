@@ -1,0 +1,28 @@
+<link rel="import" href="../bower_components/core-item/core-item.html">
+<polymer-element name="x-pprss-number-badge" attributes="number">
+  <template>
+  <style>
+    core-item {
+      font-size: 0.8em;
+      font-weight: bold;
+      text-align: right;
+    }
+  </style>
+  <core-item id="number" label="{{number}}" hidden?="{{number == 0}}">
+  </core-item>
+  </template>
+  <script>
+    (function(){
+    Polymer('x-pprss-number-badge', {
+      number: 0,
+      ready: function(){
+      },
+      domReady: function(){
+      },
+      numberChanged: function(oldValue, newValue){
+        // TODO:Validate value.
+      }
+    });
+    })();
+  </script>
+</polymer-element>

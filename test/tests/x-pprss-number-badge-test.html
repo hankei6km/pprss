@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-number-badge</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-number-badge.html">
+</head>
+<body fullbleed unresolved>
+  <x-pprss-number-badge>
+  </x-pprss-number-badge>
+
+  <script>
+    describe('<x-pprss-number-badge>', function() {
+
+      var numberBadge = document.querySelector('x-pprss-number-badge');
+
+      it('should be switch hide attribute', function(done) {
+        /* jshint expr:true */
+        numberBadge.func = function(){};
+        var stub = sinon.stub(numberBadge, 'func', function(){
+          return this.$.number.hidden;
+        });
+
+        numberBadge.number = 1;
+        numberBadge.func();
+        expect(stub.returnValues[0]).to.be.true;
+
+        setTimeout(function(){
+          numberBadge.number = 1;
+          numberBadge.func();
+          expect(stub.returnValues[1]).to.be.false;
+          done();
+        }, 100);
+      });
+
+    });
+  </script>
+
+</body>
+</html>

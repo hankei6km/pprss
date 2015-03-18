@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>number badge</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="../bower_components/paper-input/paper-input-decorator.html">
+
+    <style>
+      body {
+        margin: 0px;
+        padding: 24px;
+        overflow: hidden;
+      }
+    </style>
+
+  <link rel="import" href="../elements/x-pprss-number-badge.html">
+  </head>
+  <body fullbleed unresolved>
+    <template is="auto-binding" on-template-bound="{{handleTemplateBound}}">
+      <paper-input-decorator label="Enter number here.">
+        <input value="{{number}}"></input>
+      </paper-input-decorator>
+      <x-pprss-number-badge number="{{number}}">
+      </x-pprss-number-badge>
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      template.number = '';
+    </script>
+  </body>
+</html>
