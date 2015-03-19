@@ -70,10 +70,15 @@
           this.async(function(){
             that.articles = that.items;
             that.$.articles.setScrollTop(pos);
-            that.fire('mark-as-read', {items: that.items});
+            that.fire('mark-as-read', {holderItem: that.holderItem, items: that.items});
           });
+        }else{
+          this.fire('mark-as-read', {holderItem: holderItem, items: []});
         }
       },
+      scrollToItem: function(index){
+        this.$.articles.scrollToItem(index);
+      }
     });
     })();
   </script>
