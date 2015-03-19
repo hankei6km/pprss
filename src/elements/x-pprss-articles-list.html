@@ -55,7 +55,25 @@
             that.fire('items-changed', {err: err, items: that.items});
           }
         );
-      }
+      },
+      markAsRead: function(holderItem){
+        if(this.holderItem.uid === holderItem.uid && this.holderItem.unread > 0){
+          var len = this.items.length;
+          for(var idx = 0; idx < len; idx++){
+            this.items[idx].unread = false;
+          }
+          //this.holderItem.unread = 0;
+
+          var pos = this.$.articles.getScrollTop();
+          this.articles = [];
+          var that = this;
+          this.async(function(){
+            that.articles = that.items;
+            that.$.articles.setScrollTop(pos);
+            that.fire('mark-as-read', {items: that.items});
+          });
+        }
+      },
     });
     })();
   </script>
