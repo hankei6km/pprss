@@ -26,7 +26,12 @@
           <core-toolbar>Application</core-toolbar>
         </core-header-panel>
         <div flex tool>
-          <x-pprss-tool-title id="toolTitle" holderItem="{{holderItem}}" on-mark-as-read="{{handleMarkAsRead}}">
+          <x-pprss-tool-title
+            id="toolTitle"
+            holderItem="{{holderItem}}"
+            on-mark-as-read="{{handleMarkAsRead}}"
+            on-items-changed="{{handleItemsChanged}}"
+            >
           </x-pprss-tool-title>
         </div>
         <div>
@@ -38,6 +43,7 @@
           </div>
           <div>
             <core-item label="{{'Mark as read:' + mtitle}}" hidden?="{{!mtitle}}" ></core-item>
+            <core-item label="{{'Items changed:' + ctitle}}" hidden?="{{!ctitle}}" ></core-item>
           </div>
         </div>
       </core-scaffold>
@@ -50,6 +56,17 @@
       };
       template.cnt = 0;
       template.mtitle = '';
+      template.ctitle = '';
+      template.handleTemplateBound = function(e){
+        var that = this;
+        this.$.toolTitle.client = {
+          catchup_feed: function(holderItem, cb){
+            that.async(function(){
+              cb(null)
+            });
+          }
+        };
+      };
       template.handleTap = function(e){
         this.$.toolTitle.progressStart();
         this.cnt++;
@@ -60,6 +77,9 @@
       };
       template.handleMarkAsRead = function(e){
         this.mtitle = e.detail.holderItem.title;
+      };
+      template.handleItemsChanged = function(e){
+        this.ctitle = e.detail.holderItem.title;
       };
     </script>
   </body>

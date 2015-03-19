@@ -1,7 +1,7 @@
 <link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
 <link rel="import" href="../bower_components/core-icon-button/core-icon-button.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
-<polymer-element name="x-pprss-tool-title" attributes="holderItem">
+<polymer-element name="x-pprss-tool-title" attributes="client holderItem">
   <template>
   <style>
     .holderTitle {
@@ -47,6 +47,7 @@
     (function(){
     var progressCnt = 0;
     Polymer('x-pprss-tool-title', {
+      client: {},
       holderItem: {},
       ready: function(){
       },
@@ -66,6 +67,16 @@
       },
       handleMarkAsRead: function(e){
         this.fire('mark-as-read', {holderItem: this.holderItem});
+        var that = this;
+        this.client.catchup_feed({
+          feed_id: this.holderItem.id,
+          is_cat: this.holderItem.kind == 'cat'
+        }, function(err){
+          that.fire('items-changed', {
+            err: err,
+            holderItem: that.holderItem
+          });
+        });
       }
     });
     })();
