@@ -2,11 +2,23 @@
 <link rel="import" href="../bower_components/core-menu/core-menu.html">
 <link rel="import" href="../bower_components/core-collapse/core-collapse.html">
 <link rel="import" href="x-pprss-items-util.html">
+<link rel="import" href="x-pprss-number-badge.html">
 <polymer-element name="x-pprss-feeds-subholder" attributes="items active opened">
   <template>
   <style>
+    core-menu {
+      margin: 0px;
+    }
     .subitem {
-      margin-left: 24px;
+      margin-left: 2.5em
+    }
+    .core-selected core-item{
+      font-weight: bold;
+    }
+    core-item /deep/ #label { /* dependent structure of core-item. */
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   </style>
   <div horizontal layout>
@@ -14,11 +26,15 @@
     </core-item>
     <core-item id="label" label="{{catItem.title}}" class="{{labelClass}}" flex on-tap="{{handleLabelTap}}">
     </core-item>
+    <x-pprss-number-badge number="{{catItem.unread}}"></x-pprss-number-badge>
   </div>
   <core-collapse id="subitems" opened=false on-core-resize="{{handleResize}}">
-    <core-menu id="menu" theme="core-light-theme" selected="-1" on-core-select="{{handleItemSelect}}">
+    <core-menu id="menu" theme="core-light-theme" selected="-1" itemsSelector="div[class=subitem]" on-core-select="{{handleItemSelect}}">
       <template repeat="{{feedItem in feedItems}}">
-        <core-item class="subitem" data="{{feedItem.uid}}" label="{{feedItem.title}}"></core-item>
+        <div class="subitem" data="{{feedItem.uid}}" horizontal layout>
+          <core-item label="{{feedItem.title}}" flex></core-item>
+          <x-pprss-number-badge number="{{feedItem.unread}}"></x-pprss-number-badge>
+        </div>
       </template>
     </core-menu>
   </core-collapse>
