@@ -30,6 +30,7 @@
     <span flex class="holderTitle">{{holderItem.title}}</span>
     <core-icon-button
       icon="done"
+      hidden?="{{buttonHidden}}"
       title="Mark as read"
       on-tap="{{handleMarkAsRead}}"
       >
@@ -53,7 +54,11 @@
       },
       domReady: function(){
       },
+      buttonHidden: true,
       progressHidden: true,
+      holderItemChanged: function(oldValue, newValue){
+        this.buttonHidden = false;
+      },
       updateProgressHidden: function(){
         this.progressHidden = progressCnt <=0;
       },

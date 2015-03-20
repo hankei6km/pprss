@@ -19,6 +19,16 @@
 
       var toolTitle = document.querySelector('x-pprss-tool-title');
 
+      it('should be render icon button', function(done) {
+        /* jshint expr:true */
+        expect(toolTitle.buttonHidden).to.be.true;
+        toolTitle.holderItem = {};
+        setTimeout(function(){
+          expect(toolTitle.buttonHidden).to.be.false;
+          done();
+        }, 1);
+      });
+
       it('should be receive `mark-as-read` amd `items-changed` event', function(done) {
         var client = {catchup_feed: function(){}};
         var catchup_feed = sinon.stub(client, 'catchup_feed');
