@@ -9,6 +9,9 @@
     core-menu {
       margin: 0px;
     }
+    #expander {
+      color: gray;
+    }
     .subitem {
       margin-left: 2.5em
     }
@@ -22,7 +25,7 @@
     }
   </style>
   <div horizontal layout>
-    <core-item id="expander" icon="{{opened ? 'expand-less' : 'expand-more'}}" on-tap="{{handleToggleTap}}">
+    <core-item id="expander" icon="{{opened ? iconLess: iconMore}}" on-tap="{{handleToggleTap}}">
     </core-item>
     <core-item id="label" label="{{catItem.title}}" class="{{labelClass}}" flex on-tap="{{handleLabelTap}}">
     </core-item>
@@ -50,6 +53,8 @@
       active: false,
       opened: false,
       labelClass: '',
+      iconLess: 'expand-more',
+      iconMore: 'chevron-right',
       ready: function(){
       },
       domReady: function(){
