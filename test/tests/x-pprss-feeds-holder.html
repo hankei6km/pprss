@@ -348,6 +348,29 @@
         });
       });
 
+      it('should be mark as read articles', function(done) {
+        var func = function(e){
+          expect(e.detail.items).to.deep.equal([{
+            "uid": 10,
+            "unread": 0
+          }, {
+            "uid": 20,
+            "unread": 6
+          }]);
+          feedsHolder.removeEventListener('mark-as-read', func);
+          done();
+        };
+        feedsHolder.addEventListener('mark-as-read', func);
+
+        feedsHolder.items = [{
+          "uid": 10,
+          "unread": 5
+        }, {
+          "uid": 20,
+          "unread": 6
+        }];
+        feedsHolder.markAsRead({"uid": 10});
+      });
     });
   </script>
 

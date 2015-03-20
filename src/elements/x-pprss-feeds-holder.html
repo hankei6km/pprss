@@ -224,6 +224,14 @@
           items.forEach(eachIte(parent_uid));
           this.catGroups[idx] = [cat_items[idx]].concat(items);
         }
+      },
+
+      markAsRead: function(holderItem){
+        var idx = this.$.itemsUtil.getIndexFromUid(this.items, holderItem.uid);
+        if(idx >= 0){
+          this.items[idx].unread = 0;
+        }
+        this.fire('mark-as-read', {holderItem: holderItem, items: this.items});
       }
 
     });
