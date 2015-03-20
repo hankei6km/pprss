@@ -58,6 +58,9 @@
       ready: function(){
       },
       domReady: function(){
+        if(this.catItem.uid === 'cat:-1'){ // Special holder.
+          this.$.subitems.opened = true;
+        }
       },
       handleToggleTap: function(e){
         this.$.subitems.toggle();
