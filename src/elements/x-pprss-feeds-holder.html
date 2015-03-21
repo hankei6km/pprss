@@ -46,6 +46,7 @@
       feed_items: [],
       selected: '',
 
+      req: null,
       handleItemSelect: function(e){
         var idx =
           this.$.itemsUtil.getIndexFromUid(this.items, e.detail.uid);
@@ -57,19 +58,30 @@
         }
       },
 
-      clientChanged: function(oldValue, newValue){
-        if(newValue){
-          this.fetchItems(function(err, items){
-          });
-        }
-      },
-
       // catGroupsChanged: function(oldValue, newValue){
       // },
 
       itemsChanged: function(oldValue, newValue){
         this.fire('items-changed', {
           items: this.items
+        });
+      },
+
+      abort: function(){
+        if(this.req !== null){
+          this.req.abort();
+          this.req = null;
+        }
+      },
+
+      fetchHolder: function(){
+        this.fire('fetch-start');
+        this.abort();
+
+        var that = this;
+        this.req = this.fetchItems(function(err, items){
+          that.req = null;
+          that.fire('fetch-complete');
         });
       },
 

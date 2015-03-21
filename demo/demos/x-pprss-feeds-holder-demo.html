@@ -18,6 +18,7 @@
     <link rel="import" href="../bower_components/core-scaffold/core-scaffold.html">
     <link rel="import" href="../bower_components/core-item/core-item.html">
     <link rel="import" href="../elements/x-pprss-login-info.html">
+    <link rel="import" href="../elements/x-pprss-tool-title.html">
     <link rel="import" href="../elements/x-pprss-feeds-holder.html">
   </head>
   <body fullbleed unresolved>
@@ -32,10 +33,22 @@
       <core-scaffold>
         <core-header-panel navigation flex mode="seamed">
           <core-toolbar>Application</core-toolbar>
-          <x-pprss-feeds-holder client="{{client}}" on-items-changed="{{handleItemsChanged}}" on-select="{{handleItemSelect}}">
+          <x-pprss-feeds-holder
+            id="feeds"
+            client="{{client}}"
+            on-items-changed="{{handleItemsChanged}}"
+            on-fetch-start="{{handleFetchStart}}"
+            on-fetch-complete="{{handleFetchComplete}}"
+            on-select="{{handleItemSelect}}">
           </x-pprss-feeds-holder>
         </core-header-panel>
-        <div tool>Title</div>
+        <div flex tool>
+          <x-pprss-tool-title
+            id="toolTitle"
+            client="{{client}}"
+            >
+          </x-pprss-tool-title>
+        </div>
         <core-item label="id:{{item.id}}"></core-item>
         <core-item label="kind:{{item.kind}}"></core-item>
         <core-item label="title:{{item.title}}"></core-item>
@@ -51,6 +64,13 @@
       template.handleLoginInfoLogin = function(e){
         this.client = new TTrss(e.detail.url,
             {user: e.detail.user, password: e.detail.password, auto_login: true});
+        this.$.feeds.fetchHolder();
+      };
+      template.handleFetchStart = function(e){
+        this.$.toolTitle.progressStart();
+      };
+      template.handleFetchComplete = function(e){
+        this.$.toolTitle.progressComplete();
       };
       template.handleItemsChanged = function(e){
         console.log(e.detail.items);
