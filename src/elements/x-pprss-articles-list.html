@@ -22,20 +22,34 @@
       articles: [],
       client: {},
       holderItem: {},
+
+      req: null,
       ready: function(){
       },
       domReady: function(){
       },
-      holderItemChanged: function(oldValue, newValue){
-        if(this.client && newValue){
-          var that = this;
-          this.fetchItems(function(err, items){
-          });
+
+      abort: function(){
+        if(this.req !== null){
+          this.req.abort();
+          this.req = null;
         }
+      },
+
+      fetchArticles: function(){
+        this.fire('fetch-start');
+        this.abort();
+
+        var that = this;
+        this.req = this.fetchItems(function(err, items){
+          that.req = null;
+          that.fire('fetch-complete', {err: err});
+        });
       },
       fetchItems: function(caller_cb){
         var that = this;
-        this.client.get_headlines({
+        var aborted = false;
+        req = this.client.get_headlines({
           feed_id: this.holderItem.id,
           is_cat: this.holderItem.kind == 'cat',
           show_excerpt: false,
@@ -43,18 +57,33 @@
           include_attachments: true,
           view_mode: this.holderItem.unread > 0 ? 'unread' : 'all_articles'},
           function(err, headlines){
+            req = null;
+            if(aborted){
+              err = new Error('abort');
+            }
             if(!err){
               that.items = headlines;
               var len = that.items.length;
               for(var idx = 0; idx < len; idx++){
                 that.items[idx] = makeItem(that.client, that.holderItem, that.items[idx]);
               }
+              caller_cb(err, that.items);
+              that.articles = that.items;
+              that.fire('items-changed', {items: that.items});
+            }else{
+              caller_cb(err);
             }
-            caller_cb(err, that.items);
-            that.articles = that.items;
-            that.fire('items-changed', {err: err, items: that.items});
           }
         );
+        return {
+          abort: function(){
+            aborted = true;
+            // TODO: `Uncaught TypeError: undefined is not a function` in `Request.prototype.abort`
+            // if(req !== null){
+            //   req.abort();
+            // }
+          }
+        };
       },
       markAsRead: function(holderItem){
         if(this.holderItem.uid === holderItem.uid && this.holderItem.unread > 0){

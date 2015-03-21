@@ -11,13 +11,23 @@
   <link rel="import" href="../../dist/elements/x-pprss-articles-list.html">
 </head>
 <body fullbleed unresolved>
-  <x-pprss-articles-list>
-  </x-pprss-articles-list>
+
+  <div></div>
 
   <script>
     describe('<x-pprss-articles-list>', function() {
 
-      var articlesList = document.querySelector('x-pprss-articles-list');
+      var elm = document.querySelector('div');
+      var articlesList;
+      setup(function(done){
+        articlesList = document.createElement('x-pprss-articles-list');
+        elm.appendChild(articlesList);
+        flush(done);
+      });
+      teardown(function(done){
+        elm.removeChild(articlesList);
+        flush(done);
+      });
 
       it('should be receive `items-changed` event', function(done) {
         var client = {get_headlines: function(){}};
@@ -35,7 +45,6 @@
             view_mode: 'all_articles'
           });
           expect(e.detail).be.a('Object');
-          expect(e.detail.err).to.equal(null);
           expect(e.detail.items).be.a('Array');
           articlesList.removeEventListener('items-changed', func);
           done();
@@ -48,6 +57,7 @@
           "unread": 0,
           "cat_id": -1
         };
+        articlesList.fetchArticles();
       });
 
       it('should be fetch items that is unread', function(done) {
@@ -66,6 +76,7 @@
         articlesList.holderItem = {
           "unread": 1
         };
+        articlesList.fetchArticles();
       });
 
       it('should be mark as read articles', function(done) {
@@ -90,6 +101,50 @@
         }];
         articlesList.articles = articlesList.items;
         articlesList.markAsRead({"uid": 10});
+      });
+
+      it('should be receive events', function(done) {
+        /* jshint expr:true */
+        var cbs = {};
+        async.parallel([
+            function(cb){
+              cbs.handleFetchStart = function(){
+                cb();
+              };
+            },
+            function(cb){
+              cbs.handleFetchComplete = function(){
+                cb();
+              };
+            }
+        ], function(){
+          expect(handleFetchStart.calledOnce).to.be.true;
+          expect(handleFetchComplete.calledOnce).to.be.true;
+          expect(handleFetchComplete.calledAfter(handleFetchStart)).to.be.true;
+
+          articlesList.removeEventListener('fetch-start', cbs.handleFetchStart);
+          articlesList.removeEventListener('fetch-complete', cbs.handleFetchComplete);
+          done();
+        });
+
+        var handleFetchStart = sinon.spy(cbs, "handleFetchStart");
+        var handleFetchComplete = sinon.spy(cbs, "handleFetchComplete");
+
+        articlesList.addEventListener('fetch-start', cbs.handleFetchStart);
+        articlesList.addEventListener('fetch-complete', cbs.handleFetchComplete);
+
+        var client = {get_headlines: function(){}};
+        var get_headlines = sinon.stub(client, 'get_headlines');
+        get_headlines.callsArgWithAsync(1, null, []);
+        articlesList.client = client;
+
+        articlesList.holderItem = {
+          "id": -4,
+          "title": "All articles",
+          "unread": 0,
+          "cat_id": -1
+        };
+        articlesList.fetchArticles();
       });
 
     });
