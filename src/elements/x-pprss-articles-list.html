@@ -86,7 +86,7 @@
         };
       },
       markAsRead: function(holderItem){
-        if(this.holderItem.uid === holderItem.uid && this.holderItem.unread > 0){
+        if(this.holderItem.uid === holderItem.uid){
           var len = this.items.length;
           for(var idx = 0; idx < len; idx++){
             this.items[idx].unread = false;
