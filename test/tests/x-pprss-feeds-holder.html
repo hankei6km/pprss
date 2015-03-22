@@ -382,7 +382,7 @@
         feedsHolder.markAsRead({"uid": 10});
       });
 
-      it('should be receive events', function(done) {
+      it('should be receive `fetch` events', function(done) {
         /* jshint expr:true */
         var cbs = {};
         async.parallel([
@@ -423,6 +423,48 @@
         };
         feedsHolder.client = client;
         feedsHolder.fetchHolder();
+      });
+
+      it('should be receive `reload` events', function(done) {
+        /* jshint expr:true */
+        var cbs = {};
+        async.parallel([
+            function(cb){
+              cbs.handleReloadStart = function(){
+                cb();
+              };
+            },
+            function(cb){
+              cbs.handleReloadComplete = function(){
+                cb();
+              };
+            }
+        ], function(){
+          expect(handleReloadStart.calledOnce).to.be.true;
+          expect(handleReloadComplete.calledOnce).to.be.true;
+          expect(handleReloadComplete.calledAfter(handleReloadStart)).to.be.true;
+
+          feedsHolder.removeEventListener('reload-start', cbs.handleReloadStart);
+          feedsHolder.removeEventListener('reload-complete', cbs.handleReloadComplete);
+          done();
+        });
+
+        var handleReloadStart = sinon.spy(cbs, "handleReloadStart");
+        var handleReloadComplete = sinon.spy(cbs, "handleReloadComplete");
+
+        feedsHolder.addEventListener('reload-start', cbs.handleReloadStart);
+        feedsHolder.addEventListener('reload-complete', cbs.handleReloadComplete);
+
+        var get_categories = sinon.stub();
+        get_categories.callsArgWithAsync(1, null, [{}]);
+        var get_feeds = sinon.stub();
+        get_feeds.callsArgWithAsync(1, null, [{}]);
+        var client = {
+          get_categories: get_categories,
+          get_feeds: get_feeds
+        };
+        feedsHolder.client = client;
+        feedsHolder.reloadHolder({uid:''});
       });
     });
   </script>

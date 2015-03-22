@@ -85,6 +85,17 @@
         });
       },
 
+      reloadHolder: function(holderItem){
+        this.fire('reload-start');
+        this.abort();
+
+        var that = this;
+        this.updateItems(holderItem, function(err, holderItem, items){
+          that.req = null;
+          that.fire('reload-complete');
+        });
+      },
+
       fetchItems: function(caller_cb){
         var that = this;
         var cat_items;
@@ -135,6 +146,72 @@
             }
           }
         };
+      },
+
+      updateItems: function(holder_item, caller_cb){
+        var that = this;
+        var cat_items;
+        var feed_items;
+        var req_cat = null;
+        var req_feed = null;
+        var aborted = false;
+
+        async.parallel([function(cb){
+          // TODO: Support enable_nested?
+          req_cat = that.client.get_categories({enable_nested: false}, function(err, cat){
+            req_cat = null;
+            if(!err){
+              cat_items = that.buildCatItems(cat);
+            }
+            cb(err);
+          });
+        }, function(cb){
+          req_feed = that.client.get_feeds({cat_id: -4}, function(err, feed){
+            req_feed = null;
+            if(!err){
+              feed_items = that.buildFeedItems(feed);
+            }
+            cb(err);
+          });
+        }],
+        function(err, res){
+          if(!aborted){
+            if(!err){
+              var tran = cat_items.concat(feed_items);
+              that.items = that.$.itemsUtil.updateItemsByUid(that.items, tran, {
+                oncopy: function(ret, ridx, tran, tidx){
+                  ret[ridx].unread = tran[tidx].unread;
+                }
+              });
+              holder_item = that.getHolderItemFromUid(holder_item.uid);
+            }
+            caller_cb(err, holder_item, that.items);
+          }else{
+            caller_cb(new Error('abort'));
+          }
+        });
+        return {
+          abort: function(){
+            aborted = true;
+            if(req_cat !== null){
+              req_cat.abort();
+            }
+            if(req_feed !== null){
+              req_feed.abort();
+            }
+          }
+        };
+      },
+
+      getHolderItemFromUid: function(uid){
+        var ret = null;
+        var uids = uid.split('/');
+
+        var idx = this.$.itemsUtil.getIndexFromUid(this.items, uids[0]);
+        if(idx >= 0){
+          ret = this.items[idx];
+        }
+        return ret;
       },
 
       buildCatItems: function(cat){
