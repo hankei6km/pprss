@@ -103,7 +103,7 @@
         articlesList.markAsRead({"uid": 10});
       });
 
-      it('should be receive events', function(done) {
+      it('should be receive events at holderItem cheanged', function(done) {
         /* jshint expr:true */
         var cbs = {};
         async.parallel([
@@ -144,7 +144,6 @@
           "unread": 0,
           "cat_id": -1
         };
-        articlesList.fetchArticles();
       });
 
     });

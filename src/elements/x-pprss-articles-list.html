@@ -29,6 +29,12 @@
       domReady: function(){
       },
 
+      holderItemChanged: function(oldValue, newValue){
+        if(newValue && newValue != {}){
+          this.fetchArticles();
+        }
+      },
+
       abort: function(){
         if(this.req !== null){
           this.req.abort();
@@ -39,6 +45,9 @@
       fetchArticles: function(){
         this.fire('fetch-start');
         this.abort();
+
+        this.articles = [];
+        this.items = [];
 
         var that = this;
         this.req = this.fetchItems(function(err, items){
@@ -86,8 +95,8 @@
         };
       },
       markAsRead: function(holderItem){
-        if(this.holderItem.uid === holderItem.uid){
-          var len = this.items.length;
+        var len = this.items.length;
+        if(this.holderItem.uid === holderItem.uid && len > 0){
           for(var idx = 0; idx < len; idx++){
             this.items[idx].unread = false;
           }

@@ -2,7 +2,7 @@
 <script src="../bower_components/underscore/underscore-min.js"></script>
 <link rel="import" href="x-pprss-feeds-subholder.html">
 <link rel="import" href="x-pprss-items-util.html">
-<polymer-element name="x-pprss-feeds-holder" attributes="client">
+<polymer-element name="x-pprss-feeds-holder" attributes="client selected">
  <template>
     <core-menu theme="core-light-theme" selected="-1" itemsSelector="x-pprss-feeds-subholder">
       <template repeat="{{catGroup in catGroups}}">
