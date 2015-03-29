@@ -1,0 +1,96 @@
+<link rel="import" href="../bower_components/core-icon/core-icon.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-input-decorator.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<polymer-element name="x-pprss-login-panel" attributes="heading url user password">
+  <template>
+  <style>
+    paper-progress::shadow #activeProgress {
+      background-color: #aaaaff;
+    }
+    paper-progress::shadow #progressContainer {
+      background-color: transparent;
+    }
+    #errmsg {
+      color: #d61a7f;
+    }
+    #erricon {
+      margin-right: 4px;
+    }
+  </style>
+  <h1>{{heading}}</h1>
+  <paper-input-decorator label="url" disabled?="{{panelDisabled}}">
+    <input id="url" disabled?="{{panelDisabled}}">
+  </paper-input-decorator>
+  <paper-input-decorator label="user" disabled?="{{panelDisabled}}">
+    <input id="user" disabled?="{{panelDisabled}}">
+  </paper-input-decorator>
+  <paper-input-decorator label="password" disabled?="{{panelDisabled}}">
+    <input id="password" type="password" disabled?="{{panelDisabled}}">
+  </paper-input-decorator>
+  <div layout horizontal end-justified>
+    <paper-button raised disabled="{{panelDisabled}}" on-tap="{{handleLogin}}">
+      Login
+    </paper-button>
+  </div>
+  <div>
+    <paper-progress
+      id="progress"
+      style="width:100%"
+      class="bottom fit"
+      indeterminate
+      hidden?="{{progressHidden}}"
+      >
+    </paper-progress>
+    <segment id="errmsg" hidden?="{{!(errmsg)}}">
+      <core-icon icon="error" id="erricon"></core-icon>{{errmsg}}
+    </segment>
+  </div>
+  </template>
+  <script>
+    (function(){
+    Polymer('x-pprss-login-panel', {
+      url: '',
+      user: '',
+      password: '',
+      panelDisabled: false,
+      progressHidden: true,
+      errmsg: '',
+      ready: function(){
+      },
+      urlChanged: function(oldValue, newValue){
+        if(this.$.url){
+          this.$.url.setAttribute('value', newValue);
+        }
+      },
+      userChanged: function(oldValue, newValue){
+        if(this.$.user){
+          this.$.user.setAttribute('value', newValue);
+        }
+      },
+      passwordChanged: function(oldValue, newValue){
+        if(this.$.password){
+          this.$.password.setAttribute('value', newValue);
+        }
+      },
+      handleLogin: function(e){
+        this.errmsg = '';
+        this.panelDisabled = true;
+        this.progressHidden = false;
+        var that = this;
+        this.fire('login', {
+          url: this.$.url.value,
+          user: this.$.user.value,
+          password: this.$.password.value,
+          done: function(msg){
+            that.progressHidden = true;
+            that.panelDisabled = false;
+            that.errmsg = msg;
+          }
+        });
+      }
+    });
+    })();
+  </script>
+</polymer-element>

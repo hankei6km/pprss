@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-login-panel</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-login-panel.html">
+</head>
+<body fullbleed unresolved>
+  <x-pprss-login-panel
+    id="loginPanel"
+    url="http://localhost:4000"
+    user="test-user"
+    password="test-password"
+  >
+  </x-pprss-login-panel>
+
+  <script>
+    describe('<x-pprss-login-panel>', function() {
+
+      var loginInfo = document.querySelector('x-pprss-login-panel');
+
+      it('should be receive `login` event', function(done) {
+        addEventListener('login', function(e){ 
+          expect(e.detail).be.a('Object');
+          expect(e.detail).to.have.property('url', 'http://localhost:4000');
+          expect(e.detail).to.have.property('user', 'test-user');
+          expect(e.detail).to.have.property('password', 'test-password');
+          done();
+        });
+        loginPanel.handleLogin();
+      });
+
+    });
+  </script>
+
+</body>
+</html>
