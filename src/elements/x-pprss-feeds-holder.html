@@ -74,7 +74,7 @@
         }
       },
 
-      fetchHolder: function(){
+      fetchHolder: function(cb){
         this.fire('fetch-start');
         this.abort();
 
@@ -82,6 +82,9 @@
         this.req = this.fetchItems(function(err, items){
           that.req = null;
           that.fire('fetch-complete');
+          if(cb && typeof(cb) == 'function'){
+            cb(err);
+          }
         });
       },
 
