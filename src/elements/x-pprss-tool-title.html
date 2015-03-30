@@ -57,7 +57,10 @@
       buttonHidden: true,
       progressHidden: true,
       holderItemChanged: function(oldValue, newValue){
-        this.buttonHidden = false;
+        this.buttonHidden = true;
+        if(newValue && newValue.uid !== 'cat:-1'){
+          this.buttonHidden = false;
+        }
       },
       updateProgressHidden: function(){
         this.progressHidden = progressCnt <=0;

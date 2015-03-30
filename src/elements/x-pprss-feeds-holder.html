@@ -2,9 +2,9 @@
 <script src="../bower_components/underscore/underscore-min.js"></script>
 <link rel="import" href="x-pprss-feeds-subholder.html">
 <link rel="import" href="x-pprss-items-util.html">
-<polymer-element name="x-pprss-feeds-holder" attributes="client selected">
+<polymer-element name="x-pprss-feeds-holder" attributes="client selected allHolderItem">
  <template>
-    <core-menu theme="core-light-theme" selected="-1" itemsSelector="x-pprss-feeds-subholder">
+    <core-menu theme="core-light-theme" selected="0" itemsSelector="x-pprss-feeds-subholder">
       <template repeat="{{catGroup in catGroups}}">
         <x-pprss-feeds-subholder items="{{catGroup}}" on-select="{{handleItemSelect}}">
         </x-pprss-feeds-subholder>
@@ -50,7 +50,7 @@
       handleItemSelect: function(e){
         var idx =
           this.$.itemsUtil.getIndexFromUid(this.items, e.detail.uid);
-        if(idx > 0){
+        if(idx >= 0){
           this.selected = this.items[idx];
           this.fire('select', {
             item: this.items[idx]
@@ -62,6 +62,10 @@
       // },
 
       itemsChanged: function(oldValue, newValue){
+        var idx = this.$.itemsUtil.getIndexFromUid(newValue, 'feed:-4');
+        if(idx >= 0){
+          this.allHolderItem = newValue[idx];
+        }
         this.fire('items-changed', {
           items: this.items
         });
