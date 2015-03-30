@@ -1,0 +1,39 @@
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/core-item/core-item.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<polymer-element name="x-pprss-status-panel" attributes="allHolderItem">
+  <template>
+  <style>
+    #panel {
+      padding-bottom: 20px;
+    }
+    #infoicon {
+      margin-right: 4px;
+    }
+  </style>
+  <div id="panel" layout vertical fit>
+    <segment>
+      <core-icon icon="info-outline" id="infoicon"></core-icon>Unread:{{allHolderItem.unread}} 
+    </segment>
+    <div layout horizontal flex hidden?="{{allHolderItem.unread == 0}}">
+      <paper-button id="openUnread" raised self-end flex on-tap="{{handleOpenUnread}}">
+        Tap to open unread holder
+      </paper-button>
+    </div>
+  </div>
+  </template>
+  <script>
+    (function(){
+    Polymer('x-pprss-status-panel', {
+      allHolderItem: {},
+      ready: function(){
+      },
+      //allHolderItemChanged: function(oldValue, newValue){
+      //},
+      handleOpenUnread: function(e){
+        this.fire('open-unread', {});
+      }
+    });
+    })();
+  </script>
+</polymer-element>

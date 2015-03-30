@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-status-panel</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-status-panel.html">
+</head>
+<body fullbleed unresolved>
+
+  <div></div>
+
+  <script>
+    describe('<x-pprss-status-panel>', function() {
+
+      var elm = document.querySelector('div');
+      var statusPanel;
+      setup(function(done){
+        statusPanel = document.createElement('x-pprss-status-panel');
+        elm.appendChild(statusPanel);
+        flush(done);
+      });
+      teardown(function(done){
+        elm.removeChild(statusPanel);
+        flush(done);
+      });
+
+      it('should be switch hide attribute', function(done) {
+        /* jshint expr:true */
+        statusPanel.func = function(){};
+        var stub = sinon.stub(statusPanel, 'func', function(){
+          var e = this.$.openUnread.parentNode;
+          return e.hidden;
+        });
+
+        statusPanel.allHolderItem = {
+          unread:1
+        };
+        flush(function(){
+          statusPanel.func();
+          expect(stub.returnValues[0]).to.be.false;
+
+          statusPanel.allHolderItem.unread = 0;
+          flush(function(){
+            statusPanel.func();
+            expect(stub.returnValues[1]).to.be.true;
+            done();
+          });
+        });
+      });
+
+    });
+  </script>
+
+</body>
+</html>

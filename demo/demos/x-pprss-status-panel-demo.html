@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>status panel</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+        height: 100%;
+      }
+    </style>
+
+    <link rel="import" href="../bower_components/core-item/core-item.html">
+    <link rel="import" href="../elements/x-pprss-status-panel.html">
+  </head>
+  <body fullbleed unresolved layout vertical>
+    <template is="auto-binding">
+      <x-pprss-status-panel allHolderItem="{{allHolderItem}}" flex on-open-unread="{{handleOpenUnread}}">
+      </x-pprss-status-panel>
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      allHolderItem = {};
+      template.ready = function(e){
+        this.allHolderItem = {
+          unread: 10
+        };
+      };
+      template.handleOpenUnread = function(e){
+        this.allHolderItem.unread = 0;
+      };
+    </script>
+  </body>
+</html>
