@@ -4,7 +4,7 @@
 <link rel="import" href="x-pprss-items-util.html">
 <polymer-element name="x-pprss-feeds-holder" attributes="client selectedItem allHolderItem">
  <template>
-   <core-menu theme="core-light-theme" selected="0" itemsSelector="x-pprss-feeds-subholder">
+   <core-menu id="holders" theme="core-light-theme" selected="{{selected}}" itemsSelector="x-pprss-feeds-subholder">
       <template repeat="{{catGroup in catGroups}}">
         <x-pprss-feeds-subholder items="{{catGroup}}" on-select="{{handleItemSelect}}">
         </x-pprss-feeds-subholder>
@@ -45,6 +45,7 @@
       cat_items: [],
       feed_items: [],
       selectedItem: '',
+      selected: 0,
 
       req: null,
       handleItemSelect: function(e){
@@ -328,6 +329,30 @@
           this.items[idx].unread = 0;
         }
         this.fire('mark-as-read', {holderItem: holderItem, items: this.items});
+      },
+
+      getUnreadHolder: function(){
+        var ret = -1;
+        var items = this.catGroups.map(function(item){
+          return item[0];
+        });
+        var idx = this.$.itemsUtil.getIndexFromUnread(items, this.selected + 1);
+        if(idx >= 0){
+          //ret = items[idx].uid;
+          ret = idx;
+        }
+        return ret;
+      },
+
+      selectUnreadHolder: function(){
+        var idx = this.getUnreadHolder();
+        if(idx >= 0){
+          this.selected = idx;
+          var that = this;
+          this.async(function(){
+            that.$.holders.selectedItem.handleLabelTap();
+          });
+        }
       }
 
     });
