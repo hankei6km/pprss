@@ -6,11 +6,11 @@
     "use strict";
     /*jshint newcap:false */
 
-    function getIndexFrom(items, p, v){
+    function getIndexFrom(items, p, v, ne){
       var ret = -1;
       var len = items.length;
       for(var idx = 0; idx < len; idx++){
-        if(items[idx][p] === v){
+        if(ne ? (items[idx][p] !== v) : (items[idx][p] === v)){
           ret = idx;
           break;
         }
@@ -38,6 +38,21 @@
        */
       getIndexFromId: function getIndexFromId(items, id){
         return getIndexFrom(items, 'id', id);
+      },
+
+      getIndexFromUnread: function getIndexFromUnread(items, sidx){
+        var a1 = items.slice(sidx);
+        var a2 = items.slice(0, sidx);
+        var ret = -1;
+
+        ret = getIndexFrom(a1, 'unread', 0, true);
+        if(ret !== -1){
+          ret = ret + sidx;
+        }else{
+          ret = getIndexFrom(a2, 'unread', 0, true);
+        }
+
+        return ret;
       },
 
       mergeItems: function mergeItems(mast, tran){
