@@ -4,6 +4,12 @@
 <link rel="import" href="x-pprss-items-util.html">
 <polymer-element name="x-pprss-feeds-holder" attributes="client selectedItem allHolderItem">
  <template>
+   <style>
+    core-menu{
+      margin-left: 0px;
+      margin-right: 0px;
+    }
+   </style>
    <core-menu id="holders" theme="core-light-theme" selected="{{selected}}" itemsSelector="x-pprss-feeds-subholder">
       <template repeat="{{catGroup in catGroups}}">
         <x-pprss-feeds-subholder items="{{catGroup}}" on-select="{{handleItemSelect}}">

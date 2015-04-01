@@ -12,11 +12,25 @@
     #expander {
       color: gray;
     }
-    .subitem {
-      margin-left: 2.5em
+    .cat-item{
+      padding-left: 12px;
+      padding-right: 12px;
     }
+    .subitem {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+    .subitem-label{
+      padding-left: 2.5em;
+    }
+
+    .core-selected{
+      font-weight: normal;
+      background-color: #bbbbbb;
+    }
+
     .core-selected core-item{
-      font-weight: bold;
+      background-color: #bbbbbb;
     }
     core-item /deep/ #label { /* dependent structure of core-item. */
       overflow: hidden;
@@ -24,10 +38,10 @@
       text-overflow: ellipsis;
     }
   </style>
-  <div horizontal layout>
+  <div horizontal layout class="cat-item {{labelClass}}">
     <core-item id="expander" icon="{{opened ? iconLess: iconMore}}" on-tap="{{handleToggleTap}}">
     </core-item>
-    <core-item id="label" label="{{catItem.title}}" class="{{labelClass}}" flex on-tap="{{handleLabelTap}}">
+    <core-item id="label" label="{{catItem.title}}" flex on-tap="{{handleLabelTap}}">
     </core-item>
     <x-pprss-number-badge number="{{catItem.unread}}"></x-pprss-number-badge>
   </div>
@@ -35,7 +49,7 @@
     <core-menu id="menu" theme="core-light-theme" selected="-1" itemsSelector="div[class=subitem]" on-core-select="{{handleItemSelect}}">
       <template repeat="{{feedItem in feedItems}}">
         <div class="subitem" data="{{feedItem.uid}}" horizontal layout>
-          <core-item label="{{feedItem.title}}" flex></core-item>
+          <core-item class="subitem-label" label="{{feedItem.title}}" flex></core-item>
           <x-pprss-number-badge number="{{feedItem.unread}}"></x-pprss-number-badge>
         </div>
       </template>
