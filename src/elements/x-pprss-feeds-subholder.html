@@ -41,14 +41,14 @@
   <div horizontal layout class="cat-item {{labelClass}}">
     <core-item id="expander" icon="{{opened ? iconLess: iconMore}}" on-tap="{{handleToggleTap}}">
     </core-item>
-    <core-item id="label" label="{{catItem.title}}" flex on-tap="{{handleLabelTap}}">
+    <core-item id="label" style="{{catItem.unread>0? 'font-weight:bold': ''}}" label="{{catItem.title}}" flex on-tap="{{handleLabelTap}}">
     </core-item>
     <x-pprss-number-badge number="{{catItem.unread}}"></x-pprss-number-badge>
   </div>
   <core-collapse id="subitems" opened=false on-core-resize="{{handleResize}}">
     <core-menu id="menu" theme="core-light-theme" selected="-1" itemsSelector="div[class=subitem]" on-core-select="{{handleItemSelect}}">
       <template repeat="{{feedItem in feedItems}}">
-        <div class="subitem" data="{{feedItem.uid}}" horizontal layout>
+        <div class="subitem" style="{{feedItem.unread>0? 'font-weight:bold': ''}}" data="{{feedItem.uid}}" horizontal layout>
           <core-item class="subitem-label" label="{{feedItem.title}}" flex></core-item>
           <x-pprss-number-badge number="{{feedItem.unread}}"></x-pprss-number-badge>
         </div>
