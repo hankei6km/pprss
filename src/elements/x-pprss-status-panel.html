@@ -8,15 +8,32 @@
       padding-bottom: 20px;
     }
     #infoicon {
-      margin-right: 4px;
+      margin-right: 8px;
+    }
+    .infoicon {
+      color: gray;
+    }
+    .infoicon-unread {
+      color: #5677fc;
+    }
+    #openUnread {
+      text-transform: none;
+      color: #5677fc;
     }
   </style>
   <div id="panel" layout vertical fit>
-    <segment>
-      <core-icon icon="info-outline" id="infoicon"></core-icon>Unread:{{allHolderItem.unread}} 
+    <segment layout horizontal>
+      <core-icon
+        icon="info"
+        id="infoicon"
+        self-center
+        class="{{allHolderItem.unread == 0 ? 'infoicon' : 'infoicon-unread'}}"
+        >
+      </core-icon>
+      <core-item self-center label="Unread:{{allHolderItem.unread}}"></core-item>
     </segment>
-    <div layout horizontal flex hidden?="{{allHolderItem.unread == 0}}">
-      <paper-button id="openUnread" raised self-end flex on-tap="{{handleOpenUnread}}">
+    <div layout horizontal hidden?="{{allHolderItem.unread == 0}}">
+      <paper-button id="openUnread" self-end flex on-tap="{{handleOpenUnread}}">
         Tap to open unread holder
       </paper-button>
     </div>
@@ -28,8 +45,6 @@
       allHolderItem: {},
       ready: function(){
       },
-      //allHolderItemChanged: function(oldValue, newValue){
-      //},
       handleOpenUnread: function(e){
         this.fire('open-unread', {});
       }
