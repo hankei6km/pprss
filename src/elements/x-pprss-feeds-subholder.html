@@ -43,7 +43,7 @@
     </core-item>
     <core-item id="label" style="{{catItem.unread>0? 'font-weight:bold': ''}}" label="{{catItem.title}}" flex on-tap="{{handleLabelTap}}">
     </core-item>
-    <x-pprss-number-badge number="{{catItem.unread}}"></x-pprss-number-badge>
+    <x-pprss-number-badge number="{{catItem.unread}}" hidden?="{{catUnreadNumberHidden}}"></x-pprss-number-badge>
   </div>
   <core-collapse id="subitems" opened=false on-core-resize="{{handleResize}}">
     <core-menu id="menu" theme="core-light-theme" selected="-1" itemsSelector="div[class=subitem]" on-core-select="{{handleItemSelect}}">
@@ -67,6 +67,7 @@
       active: false,
       opened: false,
       labelClass: '',
+      catUnreadNumberHidden: false,
       iconLess: 'expand-more',
       iconMore: 'chevron-right',
       ready: function(){
@@ -112,6 +113,11 @@
       itemsChanged: function(oldValue, newValue){
         if(newValue && newValue.length > 0){
           this.catItem = newValue[0];
+          if(this.catItem.uid === 'cat:-1'){
+            this.catUnreadNumberHidden = true;
+          }else{
+            this.catUnreadNumberHidden = false;
+          }
           this.feedItems = newValue.slice(1);
         }else{
           this.catItem = {};
