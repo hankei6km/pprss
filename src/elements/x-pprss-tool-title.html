@@ -28,13 +28,6 @@
   </style>
   <core-toolbar flex>
     <span flex class="holderTitle">{{holderItem.title}}</span>
-    <core-icon-button
-      icon="done"
-      hidden?="{{buttonHidden}}"
-      title="Mark as read"
-      on-tap="{{handleMarkAsRead}}"
-      >
-    </core-icon-button>
     <paper-progress
       id="progress"
       class="bottom fit"
@@ -72,19 +65,6 @@
       progressComplete: function(){
         progressCnt--;
         this.updateProgressHidden();
-      },
-      handleMarkAsRead: function(e){
-        this.fire('mark-as-read', {holderItem: this.holderItem});
-        var that = this;
-        this.client.catchup_feed({
-          feed_id: this.holderItem.id,
-          is_cat: this.holderItem.kind == 'cat'
-        }, function(err){
-          that.fire('items-changed', {
-            err: err,
-            holderItem: that.holderItem
-          });
-        });
       }
     });
     })();

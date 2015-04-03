@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>bottom bar</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+        height: 100%;
+      }
+      x-pprss-bottom-bar {
+        position: fixed;     
+        right: 16px;
+        bottom: 16px;
+      }
+      paper-progress {
+        position: fixed;     
+        right: 0px;
+        bottom: 0px;
+        width: 100%
+      }
+    </style>
+
+    <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+    <link rel="import" href="../elements/x-pprss-bottom-bar.html">
+  </head>
+  <body fullbleed unresolved layout vertical>
+    <template is="auto-binding">
+      <x-pprss-bottom-bar
+        client="{{client}}"
+        holderItem="{{holderItem}}"
+        on-mark-as-read-start="{{handleMarkAsReadStart}}"
+        on-mark-as-read-complete="{{handleMarkAsReadComplete}}"
+        >
+      </x-pprss-bottom-bar>
+      <paper-progress
+        id="progress"
+        indeterminate
+        hidden?="{{progressHidden}}"
+        >
+      </paper-progress>
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      holderItem = {};
+      template.ready = function(e){
+        this.client = {
+          catchup_feed: function(o, cb){
+            setTimeout(function(){
+              cb(null);
+            }, 3000);
+          }
+        }
+        this.holderItem = {
+          unread: 10
+        };
+        this.progressHidden = true;
+      };
+      template.handleMarkAsReadStart = function(e){
+        this.progressHidden = false;
+      };
+      template.handleMarkAsReadComplete = function(e){
+        this.progressHidden = true;
+        console.log(this.holderItem);
+      };
+    </script>
+  </body>
+</html>

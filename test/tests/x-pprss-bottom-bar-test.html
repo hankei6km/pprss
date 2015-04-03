@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-bottom-bar</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-bottom-bar.html">
+</head>
+<body fullbleed unresolved>
+
+  <div></div>
+
+  <script>
+    describe('<x-pprss-bottom-bar>', function() {
+
+      var elm = document.querySelector('div');
+      var bottomBar;
+      setup(function(done){
+        bottomBar = document.createElement('x-pprss-bottom-bar');
+        elm.appendChild(bottomBar);
+        flush(done);
+      });
+      teardown(function(done){
+        elm.removeChild(bottomBar);
+        flush(done);
+      });
+
+      it('should be catchup feed and receive events at tap mark-as-read', function(done) {
+        /* jshint expr:true */
+        var cbs = {};
+        async.parallel([
+            function(cb){
+              cbs.handleMarkAdReadStart = function(){
+                cb();
+              };
+            },
+            function(cb){
+              cbs.handleMarkAdReadComplete = function(){
+                cb();
+              };
+            }
+        ], function(){
+          expect(bottomBar.holderItem.unread).to.equal(0);
+          expect(handleMarkAdReadStart.calledOnce).to.be.true;
+          expect(handleMarkAdReadComplete.calledOnce).to.be.true;
+          expect(handleMarkAdReadComplete.calledAfter(handleMarkAdReadStart)).to.be.true;
+
+          bottomBar.removeEventListener('mark-as-readstart', cbs.handleMarkAdReadStart);
+          bottomBar.removeEventListener('mark-as-readcomplete', cbs.handleMarkAdReadComplete);
+          done();
+        });
+
+        var handleMarkAdReadStart = sinon.spy(cbs, "handleMarkAdReadStart");
+        var handleMarkAdReadComplete = sinon.spy(cbs, "handleMarkAdReadComplete");
+
+        bottomBar.addEventListener('mark-as-read-start', cbs.handleMarkAdReadStart);
+        bottomBar.addEventListener('mark-as-read-complete', cbs.handleMarkAdReadComplete);
+
+        var client = {catchup_feed: function(){}};
+        var catchup_feed = sinon.stub(client, 'catchup_feed');
+        catchup_feed.callsArgWithAsync(1, null, []);
+        bottomBar.client = client;
+
+        bottomBar.holderItem = {
+          "unread": 10
+        };
+        bottomBar.handleMarkAsRead();
+      });
+
+    });
+  </script>
+
+</body>
+</html>

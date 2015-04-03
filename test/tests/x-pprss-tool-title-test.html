@@ -29,33 +29,6 @@
         }, 1);
       });
 
-      it('should be receive `mark-as-read` amd `items-changed` event', function(done) {
-        var client = {catchup_feed: function(){}};
-        var catchup_feed = sinon.stub(client, 'catchup_feed');
-        catchup_feed.callsArgWithAsync(1, null);
-        toolTitle.client = client;
-
-        toolTitle.holderItem = {title: 'test'};
-
-        var handleMarkAsRead = function(e){
-          expect(e.detail).be.a('Object');
-          expect(e.detail.holderItem).be.a('Object');
-          expect(e.detail.holderItem).to.have.property('title', 'test');
-          toolTitle.removeEventListener('mark-as-read', handleMarkAsRead);
-        };
-        toolTitle.addEventListener('mark-as-read', handleMarkAsRead);
-
-        var handleItemsChanged = function(e){
-          expect(e.detail).be.a('Object');
-          expect(e.detail).to.have.property('err', null);
-          toolTitle.removeEventListener('items-changed', handleItemsChanged);
-          done();
-        };
-        toolTitle.addEventListener('items-changed', handleItemsChanged);
-
-        toolTitle.handleMarkAsRead();
-      });
-
       it('should be update hidden status.', function() {
         /* jshint expr:true */
         expect(toolTitle.progressHidden).to.be.true;

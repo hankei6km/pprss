@@ -1,0 +1,48 @@
+<link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<polymer-element name="x-pprss-bottom-bar" attributes="client holderItem">
+  <template>
+  <style>
+    paper-fab.blue {
+      background: #526E9C;
+    }
+  </style>
+  <div layout horizontal end-justified>
+    <paper-fab
+      class="blue"
+      icon="done"
+      title="Mark as read"
+      on-tap="{{handleMarkAsRead}}"
+      >
+    </paper-fab>
+  </div>
+  </template>
+  <script>
+    (function(){
+    Polymer('x-pprss-bottom-bar', {
+      client: {},
+      holderItem: {},
+      ready: function(){
+      },
+      domReady: function(){
+      },
+      handleMarkAsRead: function(e){
+        this.fire('mark-as-read-start', {holderItem: this.holderItem});
+        var that = this;
+        this.client.catchup_feed({
+          feed_id: this.holderItem.id,
+          is_cat: this.holderItem.kind == 'cat'
+        }, function(err){
+          if(!err){
+            that.holderItem.unread = 0;
+          }
+          that.fire('mark-as-read-complete', {
+            err: err,
+            holderItem: that.holderItem
+          });
+        });
+      }
+    });
+    })();
+  </script>
+</polymer-element>
