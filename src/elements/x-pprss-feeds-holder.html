@@ -337,27 +337,119 @@
         this.fire('mark-as-read', {holderItem: holderItem, items: this.items});
       },
 
-      getUnreadHolder: function(){
+      getCurCatIdx: function(){
         var ret = -1;
-        var items = this.catGroups.map(function(item){
+
+        var cats = this.catGroups.map(function(item){
           return item[0];
         });
-        var idx = this.$.itemsUtil.getIndexFromUnread(items, this.selected + 1);
-        if(idx >= 0){
-          //ret = items[idx].uid;
-          ret = idx;
+
+        var uid = this.selectedItem.uid;
+        if(this.selectedItem.parent_uid){
+          uid = this.selectedItem.parent_uid;
         }
+        ret =
+          this.$.itemsUtil.getIndexFromUid(cats, uid);
+
         return ret;
       },
 
-      selectUnreadHolder: function(){
-        var idx = this.getUnreadHolder();
+      getCurFeedIdxInCat: function(){
+        var ret = -1;
+
+        if(this.selectedItem.parent_uid){
+          var catIdx = this.getCurCatIdx();
+
+          if(catIdx >= 0){
+            var feeds = this.catGroups[catIdx].slice(1);
+            ret = this.$.itemsUtil.getIndexFromUid(feeds, this.selectedItem.uid);
+          }
+        }
+
+        return ret;
+      },
+
+      getUnreadHolder: function(catIdx){
+        var ret = {
+         idx:  -1,
+         uid: ''
+        };
+
+        var items = this.catGroups.map(function(item){
+          return item[0];
+        });
+
+        var idx = this.$.itemsUtil.getIndexFromUnread(items, catIdx);
         if(idx >= 0){
-          this.selected = idx;
-          var that = this;
-          this.async(function(){
-            that.$.holders.selectedItem.handleLabelTap();
-          });
+          ret = {
+            idx: idx,
+            uid: items[idx].uid
+          };
+        }
+
+        return ret;
+      },
+
+      getUnreadFeed: function(catIdx, feedIdx){
+        var ret = {
+         idx:  -1,
+         uid: ''
+        };
+
+        var feeds = this.catGroups[catIdx].slice(1);
+        var idx = this.$.itemsUtil.getIndexFromUnread(feeds, feedIdx);
+        if(idx > feedIdx - 1){
+          ret = {
+            idx: idx,
+            uid: feeds[idx].uid
+          };
+        }
+
+        return ret;
+      },
+
+      getUnreadPath: function(){
+        var uid = '';
+        var parent;
+        var child;
+        var ret = null;
+
+        var catIdx = this.getCurCatIdx();
+        if(catIdx >= 0){
+          if(this.selectedItem.parent_uid){
+            var feedIdx = this.getCurFeedIdxInCat();
+            if(feedIdx >= 0){
+              child = this.getUnreadFeed(catIdx, feedIdx + 1);
+              if(child.idx >= 0){
+                ret = [{idx: catIdx, uid: this.catGroups[catIdx][0].uid}, child];
+              }
+            }
+          }
+          if(!ret){
+            parent = this.getUnreadHolder(catIdx + 1);
+            if(parent.idx >= 0){
+              child = this.getUnreadFeed(parent.idx, 0);
+              ret = [parent, child];
+            }
+          }
+        }
+
+        return ret;
+      },
+
+      selectPath: function(path){
+        this.selected = path[0].idx;
+
+        var that = this;
+        this.async(function(){
+          that.$.holders.selectedItem.selectPath(path);
+        });
+      },
+
+      selectUnreadHolder: function(){
+        var path = this.getUnreadPath();
+        if(path){
+          this.selectPath(path);
         }
       }
 

@@ -123,6 +123,13 @@
           this.catItem = {};
           this.feedItems = [];
         }
+      },
+      selectPath: function(path){
+        if(this.opened && path.length >= 2){
+          this.$.menu.selected = path[1].idx;
+        }else{
+          this.handleLabelTap();
+        }
       }
     });
     })();
