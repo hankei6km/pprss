@@ -3,16 +3,31 @@
 <polymer-element name="x-pprss-bottom-bar" attributes="client holderItem">
   <template>
   <style>
-    paper-fab.blue {
-      background: #526E9C;
+    paper-fab {
+      margin-left: 16px;
+    }
+    paper-fab.mark-as-read {
+      /* background: #526E9C; */
+      background: #455A64;
+    }
+    paper-fab.open-unread-holder {
+      /* background: #388E3C; */
+      background: #0097A7;
     }
   </style>
-  <div layout horizontal end-justified>
+  <div layout horizontal reverse>
     <paper-fab
-      class="blue"
+      class="mark-as-read"
       icon="done"
       title="Mark as read"
       on-tap="{{handleMarkAsRead}}"
+      >
+    </paper-fab>
+    <paper-fab
+      class="open-unread-holder"
+      icon="arrow-drop-down"
+      title="Open unread holder"
+      on-tap="{{handleOpenUnreadHolder}}"
       >
     </paper-fab>
   </div>
@@ -28,6 +43,9 @@
       },
       handleMarkAsRead: function(e){
         this.fire('mark-as-read', {holderItem: this.holderItem});
+      },
+      handleOpenUnreadHolder: function(e){
+        this.fire('open-unread', {holderItem: this.holderItem});
       }
     });
     })();
