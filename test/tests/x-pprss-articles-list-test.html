@@ -79,17 +79,46 @@
         articlesList.fetchArticles();
       });
 
-      it('should be mark as read articles', function(done) {
-        var func = function(e){
-          expect(e.detail.items).to.deep.equal([{
+      it('should be mark as read articles and receive events ', function(done) {
+        /* jshint expr:true */
+        var cbs = {};
+        async.parallel([
+            function(cb){
+              cbs.handleMarkAsReadStart = function(){
+                cb();
+              };
+            },
+            function(cb){
+              cbs.handleMarkAsReadComplete = function(){
+                cb();
+              };
+            }
+        ], function(){
+          expect(articlesList.holderItem.unread).to.equal(0);
+          expect(articlesList.items).to.deep.equal([{
             "unread": false
           }, {
             "unread": false
           }]);
-          articlesList.removeEventListener('mark-as-read', func);
+          expect(handleMarkAsReadStart.calledOnce).to.be.true;
+          expect(handleMarkAsReadComplete.calledOnce).to.be.true;
+          expect(handleMarkAsReadComplete.calledAfter(handleMarkAsReadStart)).to.be.true;
+
+          articlesList.removeEventListener('mark-as-read-start', cbs.handleMarkAsReadStart);
+          articlesList.removeEventListener('mark-as-read-complete', cbs.handleMarkAsReadComplete);
           done();
-        };
-        articlesList.addEventListener('mark-as-read', func);
+        });
+
+        var handleMarkAsReadStart = sinon.spy(cbs, "handleMarkAsReadStart");
+        var handleMarkAsReadComplete = sinon.spy(cbs, "handleMarkAsReadComplete");
+
+        articlesList.addEventListener('mark-as-read-start', cbs.handleMarkAsReadStart);
+        articlesList.addEventListener('mark-as-read-complete', cbs.handleMarkAsReadComplete);
+
+        var client = {mark_read: function(){}};
+        var mark_read = sinon.stub(client, 'mark_read');
+        mark_read.callsArgWithAsync(1, null, {});
+        articlesList.client = client;
 
         articlesList.holderItem.uid = 10;
         articlesList.holderItem.unread = 2;
@@ -99,7 +128,7 @@
         }, {
           "unread": true
         }];
-        articlesList.articles = articlesList.items;
+
         articlesList.markAsRead({"uid": 10});
       });
 

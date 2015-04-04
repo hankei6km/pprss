@@ -96,22 +96,45 @@
       },
       markAsRead: function(holderItem){
         var len = this.items.length;
-        if(this.holderItem.uid === holderItem.uid && len > 0){
-          for(var idx = 0; idx < len; idx++){
-            this.items[idx].unread = false;
-          }
-          //this.holderItem.unread = 0;
+        var ids = [];
 
-          var pos = this.$.articles.getScrollTop();
-          this.articles = [];
-          var that = this;
-          this.async(function(){
-            that.articles = that.items;
-            that.$.articles.setScrollTop(pos);
-            that.fire('mark-as-read', {holderItem: that.holderItem, items: that.items});
-          });
+        if(this.holderItem.uid === holderItem.uid){
+
+          for(var idx = 0; idx < len; idx++){
+            if(this.items[idx].unread){
+              ids.push(this.items[idx].id);
+              this.items[idx].unread = false;
+            }
+          }
+
+          if(ids.length > 0){
+
+            this.holderItem.unread = 0;
+
+            var that = this;
+
+            var pos = this.$.articles.getScrollTop();
+            this.articles = [];
+            this.async(function(){
+              that.articles = that.items;
+              that.$.articles.setScrollTop(pos);
+              //that.fire('mark-as-read', {holderItem: that.holderItem, items: that.items});
+            });
+
+            this.fire('mark-as-read-start', {holderItem: this.holderItem});
+            this.client.mark_read({
+              article_id: ids
+            }, function(err){
+              that.fire('mark-as-read-complete', {
+                err: err,
+                holderItem: that.holderItem
+              });
+            });
+
+          }
+
         }else{
-          this.fire('mark-as-read', {holderItem: holderItem, items: []});
+          //this.fire('mark-as-read', {holderItem: holderItem, items: []});
         }
       },
       scrollToItem: function(index){

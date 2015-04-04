@@ -31,44 +31,20 @@
 
       it('should be catchup feed and receive events at tap mark-as-read', function(done) {
         /* jshint expr:true */
-        var cbs = {};
-        async.parallel([
-            function(cb){
-              cbs.handleMarkAdReadStart = function(){
-                cb();
-              };
-            },
-            function(cb){
-              cbs.handleMarkAdReadComplete = function(){
-                cb();
-              };
-            }
-        ], function(){
-          expect(bottomBar.holderItem.unread).to.equal(0);
-          expect(handleMarkAdReadStart.calledOnce).to.be.true;
-          expect(handleMarkAdReadComplete.calledOnce).to.be.true;
-          expect(handleMarkAdReadComplete.calledAfter(handleMarkAdReadStart)).to.be.true;
 
-          bottomBar.removeEventListener('mark-as-readstart', cbs.handleMarkAdReadStart);
-          bottomBar.removeEventListener('mark-as-readcomplete', cbs.handleMarkAdReadComplete);
-          done();
-        });
-
-        var handleMarkAdReadStart = sinon.spy(cbs, "handleMarkAdReadStart");
-        var handleMarkAdReadComplete = sinon.spy(cbs, "handleMarkAdReadComplete");
-
-        bottomBar.addEventListener('mark-as-read-start', cbs.handleMarkAdReadStart);
-        bottomBar.addEventListener('mark-as-read-complete', cbs.handleMarkAdReadComplete);
-
-        var client = {catchup_feed: function(){}};
-        var catchup_feed = sinon.stub(client, 'catchup_feed');
-        catchup_feed.callsArgWithAsync(1, null, []);
-        bottomBar.client = client;
+        var handleMarkAsRead = sinon.stub();
+        bottomBar.addEventListener('mark-as-read', handleMarkAsRead);
 
         bottomBar.holderItem = {
           "unread": 10
         };
         bottomBar.handleMarkAsRead();
+
+        setTimeout(function(){
+          expect(handleMarkAsRead.calledOnce).to.be.true;
+          bottomBar.removeEventListener('mark-as-read', handleMarkAsRead);
+          done();
+        }, 1);
       });
 
     });

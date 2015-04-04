@@ -27,20 +27,7 @@
       domReady: function(){
       },
       handleMarkAsRead: function(e){
-        this.fire('mark-as-read-start', {holderItem: this.holderItem});
-        var that = this;
-        this.client.catchup_feed({
-          feed_id: this.holderItem.id,
-          is_cat: this.holderItem.kind == 'cat'
-        }, function(err){
-          if(!err){
-            that.holderItem.unread = 0;
-          }
-          that.fire('mark-as-read-complete', {
-            err: err,
-            holderItem: that.holderItem
-          });
-        });
+        this.fire('mark-as-read', {holderItem: this.holderItem});
       }
     });
     })();
