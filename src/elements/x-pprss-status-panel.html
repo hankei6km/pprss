@@ -1,14 +1,22 @@
 <link rel="import" href="../bower_components/core-icons/core-icons.html">
 <link rel="import" href="../bower_components/core-item/core-item.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <polymer-element name="x-pprss-status-panel" attributes="allHolderItem">
   <template>
   <style>
     #panel {
-      padding-bottom: 20px;
+      margin: 0px;
+      padding: 0px;
     }
+    .article {
+      padding: 16px 16px 24px 16px;
+    }
+
     #infoicon {
       margin-right: 8px;
+      height: 40px;
+      width: 40px;
     }
     .infoicon {
       color: gray;
@@ -16,27 +24,78 @@
     .infoicon-unread {
       color: #5677fc;
     }
-    #openUnread {
-      text-transform: none;
-      color: #5677fc;
+
+    .tips-item {
+      margin-bottom: 16px;
+    }
+    paper-fab {
+      margin-right: 16px;
+    }
+    paper-fab.mark-as-read {
+      /* background: #526E9C; */
+      background: #455A64;
+    }
+    paper-fab.open-unread-holder {
+      /* background: #388E3C; */
+      background: #0097A7;
     }
   </style>
   <div id="panel" layout vertical fit>
-    <segment layout horizontal>
-      <core-icon
-        icon="info"
-        id="infoicon"
-        self-center
-        class="{{allHolderItem.unread == 0 ? 'infoicon' : 'infoicon-unread'}}"
-        >
-      </core-icon>
-      <core-item self-center label="Unread:{{allHolderItem.unread}}"></core-item>
-    </segment>
-    <div layout horizontal hidden?="{{allHolderItem.unread == 0}}">
-      <paper-button id="openUnread" self-end flex on-tap="{{handleOpenUnread}}">
-        Tap to open unread holder
-      </paper-button>
+    <core-toolbar>
+      <div flex>
+        <core-item label="Status">
+        </core-item>
+      </div>
+    </core-toolbar>
+    <div class="article">
+      <div layout horizontal>
+        <core-icon
+          icon="info"
+          id="infoicon"
+          self-center
+          class="{{allHolderItem.unread == 0 ? 'infoicon' : 'infoicon-unread'}}"
+          >
+        </core-icon>
+        <core-item self-center label="Unread:{{allHolderItem.unread}}"></core-item>
+      </div>
     </div>
+
+    <core-toolbar>
+      <div flex>
+        <core-item label="Tips">
+        </core-item>
+      </div>
+    </core-toolbar>
+    <div class="article">
+      <div layout vertical>
+        <div class="tips-item" layout horizontal>
+          <paper-fab
+            class="mark-as-read"
+            self-center
+            mini
+            icon="done"
+            title="Mark as read"
+            >
+          </paper-fab>
+          <core-item label="Mark as read">
+          </core-item>
+        </div>
+        <div class="tips-item" layout horizontal>
+          <paper-fab
+            class="open-unread-holder"
+            self-center
+            mini
+            icon="arrow-drop-down"
+            title="Open unread holder"
+            on-tap="{{handleOpenUnreadHolder}}"
+            >
+          </paper-fab>
+          <core-item label="Open unread holder">
+          </core-item>
+        </div>
+      </div>
+    </div>
+
   </div>
   </template>
   <script>
@@ -45,7 +104,7 @@
       allHolderItem: {},
       ready: function(){
       },
-      handleOpenUnread: function(e){
+      handleOpenUnreadHolder: function(e){
         this.fire('open-unread', {});
       }
     });

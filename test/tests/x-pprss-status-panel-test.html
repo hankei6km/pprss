@@ -29,12 +29,12 @@
         flush(done);
       });
 
-      it('should be switch hide attribute', function(done) {
+      it('should be switch icon class', function(done) {
         /* jshint expr:true */
         statusPanel.func = function(){};
         var stub = sinon.stub(statusPanel, 'func', function(){
-          var e = this.$.openUnread.parentNode;
-          return e.hidden;
+          var e = this.$.infoicon;
+          return e.className;
         });
 
         statusPanel.allHolderItem = {
@@ -42,12 +42,12 @@
         };
         flush(function(){
           statusPanel.func();
-          expect(stub.returnValues[0]).to.be.false;
+          expect(stub.returnValues[0]).to.be.equal('infoicon-unread');
 
           statusPanel.allHolderItem.unread = 0;
           flush(function(){
             statusPanel.func();
-            expect(stub.returnValues[1]).to.be.true;
+            expect(stub.returnValues[1]).to.be.equal('infoicon');
             done();
           });
         });
