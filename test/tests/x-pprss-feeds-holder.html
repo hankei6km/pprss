@@ -19,8 +19,18 @@
 
       var elm = document.querySelector('div');
       var feedsHolder;
+      var scroller = {
+        scrollTop: 0,
+        getBoundingClientRect: function(){
+          return {
+            top:0,
+            bottom: 1000
+          };
+        }
+      };
       setup(function(done){
         feedsHolder = document.createElement('x-pprss-feeds-holder');
+        feedsHolder.scroller = scroller;
         elm.appendChild(feedsHolder);
         flush(done);
       });
@@ -353,7 +363,15 @@
         feedsHolder.handleItemSelect({
           detail: {
             isSelected: true,
-            uid: 'feed:1-2'
+            uid: 'feed:1-2',
+            rect: {
+              top: 10,
+              bottom: 20
+            },
+            outerRect: {
+              top: 10,
+              bottom: 20
+            }
           }
         });
       });

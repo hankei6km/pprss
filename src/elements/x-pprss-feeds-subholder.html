@@ -88,7 +88,9 @@
         this.labelClass = 'core-selected';
         this.$.menu.selected = -1;
         this.fire('select', {
-          uid: this.items[0].uid
+          uid: this.items[0].uid,
+          rect: this.getBoundingClientRect(),
+          outerRect: this.getBoundingClientRect()
         });
       },
       handleResize: function(e){
@@ -98,7 +100,9 @@
         if(e.detail.isSelected){
           this.labelClass = '';
           this.fire('select', {
-            uid: e.detail.item.getAttribute('data')
+            uid: e.detail.item.getAttribute('data'),
+            rect: e.detail.item.getBoundingClientRect(),
+            outerRect: this.getBoundingClientRect()
           });
         }
       },

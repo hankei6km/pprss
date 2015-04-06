@@ -11,11 +11,32 @@
   <link rel="import" href="../../dist/elements/x-pprss-feeds-subholder.html">
 </head>
 <body fullbleed unresolved>
-  <x-pprss-feeds-subholder>
-  </x-pprss-feeds-subholder>
+  <div></div>
 
   <script>
     describe('<x-pprss-feeds-subholder>', function() {
+
+      var elm = document.querySelector('div');
+      var feedsSubholder;
+      var scroller = {
+        scrollTop: 0,
+        getBoundingClientRect: function(){
+          return {
+            top:0,
+            bottom: 1000
+          };
+        }
+      };
+      setup(function(done){
+        feedsSubholder = document.createElement('x-pprss-feeds-subholder');
+        feedsSubholder.scroller = scroller;
+        elm.appendChild(feedsSubholder);
+        flush(done);
+      });
+      teardown(function(done){
+        elm.removeChild(feedsSubholder);
+        flush(done);
+      });
 
       var items = [
         {
@@ -36,7 +57,6 @@
           unread: 0
         }
       ];
-      var feedsSubholder = document.querySelector('x-pprss-feeds-subholder');
 
       it('should set `cat` and `feeds` via `itemsChanged`', function(done) {
         /* jshint expr:true */
@@ -66,11 +86,18 @@
         feedsSubholder.items = items;
         var cb =  sinon.stub();
         cb.withArgs('data').returns('feed:1-2');
+        var icb = sinon.stub();
+        icb.returns({
+          top: 10,
+          bottom: 20
+        });
+        cb.returns('feed:1-2');
         feedsSubholder.handleItemSelect({
           detail: {
             isSelected: true,
             item: {
-              getAttribute: cb
+              getAttribute: cb,
+              getBoundingClientRect: icb
             }
           }
         });

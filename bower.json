@@ -29,6 +29,8 @@
     "underscore": "~1.8.2",
     "async": "~0.9.2",
     "core-toolbar": "Polymer/core-toolbar#~0.5.5",
-    "paper-progress": "Polymer/paper-progress#~0.5.5"
+    "paper-progress": "Polymer/paper-progress#~0.5.5",
+    "core-animated-pages": "Polymer/core-animated-pages#~0.5.5",
+    "core-animation": "Polymer/core-animation#^0.5"
   }
 }

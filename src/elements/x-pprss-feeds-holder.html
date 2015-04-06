@@ -1,8 +1,9 @@
 <script src="../bower_components/async/lib/async.js"></script>
 <script src="../bower_components/underscore/underscore-min.js"></script>
+<link rel="import" href="../bower_components/core-animation/core-animation.html">
 <link rel="import" href="x-pprss-feeds-subholder.html">
 <link rel="import" href="x-pprss-items-util.html">
-<polymer-element name="x-pprss-feeds-holder" attributes="client selectedItem allHolderItem">
+<polymer-element name="x-pprss-feeds-holder" attributes="client selectedItem allHolderItem scroller">
  <template>
    <style>
     core-menu{
@@ -20,6 +21,9 @@
   </template>
   <script>
     (function(){
+
+    var animation = null;
+    var player = null;
 
     function makeItem(client, in_opts){
       var opts = {
@@ -44,6 +48,8 @@
       ready: function(){
       },
       domReady: function(){
+        animation = new CoreAnimation();
+        animation.addEventListener('core-animation-finish', this.handleAnimationFinish.bind(this));
       },
       client: {},
       catGroups: [],
@@ -52,17 +58,72 @@
       feed_items: [],
       selectedItem: '',
       selected: 0,
+      scroller: null,
 
       req: null,
       handleItemSelect: function(e){
         var idx =
           this.$.itemsUtil.getIndexFromUid(this.items, e.detail.uid);
+
         if(idx >= 0){
+
+          var itemRect = e.detail.rect;
+          var outerRect = e.detail.outerRect;
+          var scrollerRect = this.scroller.getBoundingClientRect();
+          if(itemRect.top < scrollerRect.top){
+            if(scrollerRect.bottom < itemRect.bottom - outerRect.top){
+              this.scrollAnimation(this.scroller,
+                  this.scroller.scrollTop, itemRect.bottom + this.scroller.scrollTop - scrollerRect.bottom);
+            }else{
+              this.scrollAnimation(this.scroller,
+                  this.scroller.scrollTop, outerRect.top + this.scroller.scrollTop - scrollerRect.top);
+            }
+          }else if(scrollerRect.bottom < itemRect.bottom){
+            this.scrollAnimation(this.scroller,
+                this.scroller.scrollTop, itemRect.bottom + this.scroller.scrollTop - scrollerRect.bottom);
+          }
+
           this.selectedItem = this.items[idx];
           this.fire('select', {
             item: this.items[idx]
           });
+
         }
+      },
+
+      scrollAnimation: function(target, start, end){
+        if(player !== null){
+          player.cancel();
+          player = null;
+        }
+
+        animation.duration = 300;
+        animation.keyframes = [{
+          scrollTop: start
+        }, {
+          scrollTop: end
+        }];
+        animation.easing = 'ease-out';
+        animation.target = this.scroller;
+
+        var dlt = end - start;
+        animation.customEffect = function (timeFraction, target, animation) {
+          // animate element attribute(`scrollTop`).
+          // https://github.com/Polymer/core-animation/issues/10
+          // http://stackoverflow.com/questions/26302140/animate-dom-properties-scrolltop-using-web-animations/26852482#26852482
+          if(timeFraction !== null){
+            target.scrollTop = start + dlt * timeFraction;
+          }else{
+            target.scrollTop = start + dlt;
+          }
+        };
+
+        player = animation.play();
+      },
+
+      handleAnimationFinish: function(e){
+        // player.cancel();
+        player = null;
       },
 
       // catGroupsChanged: function(oldValue, newValue){
