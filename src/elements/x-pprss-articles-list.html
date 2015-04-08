@@ -58,7 +58,7 @@
       fetchItems: function(caller_cb){
         var that = this;
         var aborted = false;
-        req = this.client.get_headlines({
+        var req = this.client.get_headlines({
           feed_id: this.holderItem.id,
           is_cat: this.holderItem.kind == 'cat',
           show_excerpt: false,
