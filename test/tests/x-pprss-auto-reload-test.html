@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+  <title>x-pprss-auto-reload</title>
+
+  <script src="../../dist/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../bower_components/web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../dist/elements/x-pprss-auto-reload.html">
+</head>
+<body fullbleed unresolved>
+
+  <div></div>
+
+  <script>
+    describe('<x-pprss-auto-reload>', function() {
+
+      var elm = document.querySelector('div');
+      var autoReload;
+      setup(function(done){
+        autoReload = document.createElement('x-pprss-auto-reload');
+        elm.appendChild(autoReload);
+        flush(done);
+      });
+      teardown(function(done){
+        elm.removeChild(autoReload);
+        flush(done);
+      });
+
+      it('should be receive `trigger-reload` event', function(done) {
+        /* jshint expr:true */
+        var get_headlines = sinon.stub();
+        get_headlines.onCall(0).callsArgWithAsync(1, null, [{id:1}]);
+        get_headlines.onCall(1).callsArgWithAsync(1, null, [{id:1}]);
+        get_headlines.onCall(2).callsArgWithAsync(1, null, [{id:2}]);
+        var client = {get_headlines: get_headlines};
+        autoReload.client = client;
+
+        var func = function(e){
+          expect(get_headlines.callCount).to.be.equal(3);
+          expect(triggerReload.calledOnce).to.be.true;
+
+          autoReload.removeEventListener('trigger-reload', func);
+          done();
+        };
+        autoReload.addEventListener('trigger-reload', func);
+
+        var triggerReload = sinon.spy(autoReload, 'triggerReload');
+
+        _.defer(autoReload.getTopItem.bind(autoReload));
+        _.defer(autoReload.getTopItem.bind(autoReload));
+        _.defer(autoReload.getTopItem.bind(autoReload));
+      });
+
+      it('should be start to update at enabled changed', function(done) {
+        /* jshint expr:true */
+        var get_headlines = sinon.stub();
+        get_headlines.callsArgWithAsync(1, null, [{id:1}]);
+        var client = {get_headlines: get_headlines};
+        autoReload.client = client;
+
+        var getTopItem = sinon.spy(autoReload, 'getTopItem');
+
+        autoReload.enabled = false;
+        autoReload.interval = 0;
+
+        setTimeout(function(){
+          expect(get_headlines.called).to.be.false;
+          expect(getTopItem.called).to.be.false;
+
+          autoReload.enabled = true;
+
+          setTimeout(function(){
+            expect(get_headlines.called).to.be.true;
+            expect(getTopItem.called).to.be.true;
+
+            done();
+          }, 100);
+
+        },100);
+      });
+
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
+    <title>auto reload</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        padding: 24px;
+        overflow: hidden;
+      }
+      paper-checkbox {
+        padding-right: 20px;
+      }
+    </style>
+
+    <script src="../js/libs/ttrss-node.js"></script>
+
+    <link rel="import" href="../bower_components/core-label/core-label.html">
+    <link rel="import" href="../bower_components/core-item/core-item.html">
+    <link rel="import" href="../bower_components/paper-input/paper-input.html">
+    <link rel="import" href="../bower_components/paper-input/paper-input-decorator.html">
+    <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+    <link rel="import" href="../elements/x-pprss-auto-reload.html">
+  </head>
+  <body fullbleed unresolved>
+    <template is="auto-binding" on-template-bound="{{handleTemplateBound}}">
+      <x-pprss-auto-reload
+        client="{{client}}"
+        enabled="{{enabled}}"
+        interval="{{interval}}"
+        on-trigger-reload="{{handleTriggerReload}}"
+        >
+      </x-pprss-auto-reload>
+      <core-label layout horizontal>
+        <paper-checkbox for checked="{{enabled}}"></paper-checkbox><div>Enable</div>
+      </core-label>
+      <paper-input-decorator autofocus=true floatingLabel label="Edit id of article.">
+        <input id="latestId" value="{{latestId}}">
+      </paper-input-decorator>
+      <paper-input-decorator floatingLabel label="Enter the interval time(sec) here.">
+        <input id="interval" value="{{interval}}">
+      </paper-input-decorator>
+      <core-item label="Trigger: {{cnt}}">
+      </core-item>
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      template.enabled = true;
+      template.latestId = 10;
+      template.interval = 1;
+      template.client = {};
+      template.cnt = 0;
+      template.domReady = function(){
+        template.client = {
+          get_headlines: function(o, c){
+            template.async(function(){
+              c(null, [{id: template.latestId}]);
+            });
+          }
+        }
+      };
+      template.handleTriggerReload = function(){
+        console.log('trigger');
+        template.cnt++;
+      };
+
+    </script>
+  </body>
+</html>

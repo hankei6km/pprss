@@ -1,0 +1,98 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="x-pprss-auto-reload" attributes="client enabled interval">
+  <template>
+  </template>
+  <script>
+    (function(){
+    Polymer('x-pprss-auto-reload', {
+      client: {},
+      enabled: false,
+      interval: 120,
+      saveId: null,
+      req: null,
+      timerId: null,
+      ready: function(){
+      },
+      domReady: function(){
+        if(this.enabled){
+          this.startTimer(this.interval);
+        }
+      },
+      intervalChanged: function(oldValue, newValue){
+        this.stopTimer();
+        if(this.enabled){
+          this.startTimer(newValue);
+        }
+      },
+      enabledChanged: function(oldValue, newValue){
+        if(newValue === true){
+          this.startTimer(this.interval);
+        }else{
+          this.stopTimer();
+        }
+      },
+      startTimer: function(inInterval){
+        this.stopTimer();
+        var interval = 120;
+        if((inInterval + '').match(/[0-9]+/)){
+          interval = parseInt(inInterval, 10); 
+        }
+        this.timerId =
+          setInterval(this.timerUpdate.bind(this), interval * 1000);
+      },
+      stopTimer: function(){
+        if(this.timerId){
+          clearTimeout(this.timerId);
+        }
+        this.timerId = null;
+      },
+      timerUpdate: function(){
+        this.getTopItem();
+      },
+
+      abort: function(){
+        if(this.req !== null){
+          this.req.abort();
+          this.req = null;
+        }
+      },
+      getTopItem: function(){
+        var aborted = false;
+        var opts = {
+          feed_id: -4,
+          limit: 1,
+          skip: 0,
+          is_cat: false,
+          show_excerpt: false,
+          show_content: false,
+          include_attachments: false,
+          include_nested: false,
+          view_mode: 'all_articles'
+        };
+        var that = this;
+        var req = this.client.get_headlines(opts, function(err, headlines){
+          that.req = null;
+          if(aborted){
+            err = new Error('abort');
+          }
+          if(!err && headlines[0]){
+            if(that.saveId !== null && that.saveId != headlines[0].id){
+              that.triggerReload();
+            }
+            that.saveId = headlines[0].id;
+          }
+        });
+        this.req = {
+          abort: function(){
+            // req.abort();
+            abort = true;
+          }
+        };
+      },
+      triggerReload: function(){
+        this.fire('trigger-reload');
+      }
+    });
+    })();
+  </script>
+</polymer-element>
