@@ -438,12 +438,13 @@
 
         var items = this.catGroups.map(function(item){
           return item[0];
-        });
+        }).slice(1); // Skip "special" holder.
 
-        var idx = this.$.itemsUtil.getIndexFromUnread(items, catIdx);
+        // Adjust start idx(catIdx).
+        var idx = this.$.itemsUtil.getIndexFromUnread(items, catIdx > 0 ? catIdx - 1 : catIdx);
         if(idx >= 0){
           ret = {
-            idx: idx,
+            idx: idx + 1, // Adjust result idx.
             uid: items[idx].uid
           };
         }
@@ -492,6 +493,10 @@
               child = this.getUnreadFeed(parent.idx, 0);
               ret = [parent, child];
             }
+          }
+          if(!ret){
+            // Select Special holder when already all articles has been read.
+            ret = [{idx: 0, uid: this.catGroups[0][0].uid}];
           }
         }
 
