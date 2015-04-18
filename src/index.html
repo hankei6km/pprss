@@ -1,11 +1,187 @@
+<!doctype html>
 <html>
-  </head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <script src="js/bundle.js"></script>
+    <title>pprss</title>
+    <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+        font-family: sans-serif;
+      }
+      .login-panel {
+        padding: 12px;
+      }
+      x-pprss-bottom-bar {
+        position: fixed;     
+        right: 16px;
+        bottom: 16px;
+      }
+    </style>
+
+    <script src="../js/libs/ttrss-node.js"></script>
+
+    <link rel="import" href="bower_components/core-animated-pages/core-animated-pages.html"> 
+    <link rel="import" href="../bower_components/core-scaffold/core-scaffold.html">
+    <link rel="import" href="../bower_components/core-item/core-item.html">
+    <link rel="import" href="../elements/x-pprss-login-panel.html">
+    <link rel="import" href="../elements/x-pprss-feeds-holder.html">
+    <link rel="import" href="../elements/x-pprss-tool-title.html">
+    <link rel="import" href="../elements/x-pprss-status-panel.html">
+    <link rel="import" href="../elements/x-pprss-articles-list.html">
+    <link rel="import" href="../elements/x-pprss-bottom-bar.html">
+    <link rel="import" href="../elements/x-pprss-auto-reload.html">
   </head>
-  <body>
-    Hello
+  <body fullbleed unresolved>
+    <template is="auto-binding">
+      <core-animated-pages flex fit id="pages" selected="{{page}}" transitions="cross-fade-all">
+      <div class="login-panel">
+      <x-pprss-login-panel
+        id="loginPanel"
+        class="loginPanel"
+        heading="Login Panel"
+        on-login="{{handleLogin}}"
+      >
+      </x-pprss-login-panel>
+      </div> 
+      <div>
+      <x-pprss-auto-reload
+        client="{{client}}"
+        enabled="{{enabled}}"
+        on-trigger-reload="{{handleTriggerReload}}"
+        >
+      </x-pprss-auto-reload>
+      <core-scaffold>
+        <core-header-panel id="headerPanel" navigation flex mode="seamed">
+          <x-pprss-feeds-holder
+            id="feeds"
+            client="{{client}}"
+            selectedItem="{{curHolderItem}}"
+            allHolderItem="{{allHolderItem}}"
+            on-fetch-start="{{progressStart}}"
+            on-fetch-complete="{{handleFetchHolderComplete}}"
+            on-reload-start="{{progressStart}}"
+            on-reload-complete="{{progressComplete}}"
+            on-items-changed="{{handleHolderItemsChanged}}"
+            on-select="{{handleHolderItemSelect}}"
+            >
+          </x-pprss-feeds-holder>
+        </core-header-panel>
+        <div flex tool>
+          <x-pprss-tool-title
+            id="toolTitle"
+            client="{{client}}"
+            holderItem="{{curHolderItem}}"
+            >
+          </x-pprss-tool-title>
+        </div>
+        <div hidden?="{{curHolderItem.uid === 'cat:-1'}}">
+          <x-pprss-articles-list
+            id="articles"
+            client="{{client}}"
+            articles="{{articles}}"
+            holderItem="{{curHolderItem}}"
+            on-fetch-start="{{progressStart}}"
+            on-fetch-complete="{{progressComplete}}"
+            on-items-changed="{{handleArticleItemsChanged}}"
+            on-mark-as-read-start="{{handleMarkAsReadStart}}"
+            on-mark-as-read-complete="{{handleMarkAsReadComplete}}"
+            >
+          </x-pprss-articles-list>
+        </div>
+        <div hidden?="{{curHolderItem.uid !== 'cat:-1'}}">
+          <x-pprss-status-panel
+            allHolderItem="{{allHolderItem}}"
+            on-open-unread="{{handleOpenUnread}}"
+            >
+          </x-pprss-status-panel>
+        </div>
+        <x-pprss-bottom-bar
+          client="{{client}}"
+          holderItem="{{curHolderItem}}"
+          on-mark-as-read="{{handleMarkAsRead}}"
+          on-open-unread="{{handleOpenUnread}}"
+          >
+        </x-pprss-bottom-bar>
+      </core-scaffold>
+      </div>
+      </core-animated-pages>
+    </template>
+
+    <script>
+      var template = document.querySelector('template[is=auto-binding]');
+      template.page = 0;
+      template.title = 'pprss';
+      template.client = null;
+      template.enabled = false;
+      template.loginDone = null;
+      template.curHolderItem = null;
+      template.allHolderItem = {unread:0};
+      template.progressStart = function(e){
+        this.$.toolTitle.progressStart();
+      };
+      template.progressComplete = function(e){
+        this.$.toolTitle.progressComplete();
+        if(this.allHolderItem.unread === 0){
+          document.title = this.title;
+        }else{
+          document.title = this.title + ' (' + this.allHolderItem.unread + ')';
+        }
+      };
+      template.handleLogin = function(e){
+        this.client = new TTrss(e.detail.url,
+            {user: e.detail.user, password: e.detail.password, auto_login: true});
+        //var that = this;
+        this.loginDone = e. detail.done;
+        this.$.feeds.fetchHolder(function(err){
+          //if(!err){
+          //  that.loggedin = true;
+          //  e.detail.done();
+          //}else{
+          //  e.detail.done(err.message);
+          //}
+        });
+        this.enabled = true;
+      };
+      template.handleFetchHolderComplete = function(e){
+        var err = e.detail.err;
+        if(!err){
+          this.$.feeds.scroller = this.$.headerPanel.scroller;
+          this.page = 1;
+          this.loginDone();
+          this.loginDone = null;
+          this.progressComplete();
+          this.handleFetchHolderComplete = this.progressComplete;
+        }else{
+          this.loginDone(err.message);
+          this.progressComplete();
+        }
+      };
+      template.handleArticleItemsChanged = function(e){
+        this.$.articles.scrollToItem(0);
+      };
+      template.handleMarkAsReadStart = function(e){
+        this.$.feeds.markAsRead(e.detail.holderItem);
+        this.progressStart();
+      };
+      template.handleMarkAsReadComplete = function(e){
+        this.$.feeds.reloadHolder(e.detail.holderItem);
+        this.progressComplete();
+      };
+      template.handleMarkAsRead = function(e){
+        this.$.articles.markAsRead(e.detail.holderItem);
+      };
+      template.handleOpenUnread = function(e){
+        this.$.feeds.selectUnreadHolder();
+      };
+      template.handleTriggerReload = function(e){
+        console.log('--trigger');
+        this.$.feeds.reloadHolder(this.curHolderItem);
+      };
+      template.articles = [];
+    </script>
   </body>
 </html>
