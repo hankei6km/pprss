@@ -443,6 +443,51 @@
         feedsHolder.fetchHolder();
       });
 
+      it('should be receive error', function(done) {
+        /* jshint expr:true */
+        var cbs = {};
+        async.parallel([
+            function(cb){
+              cbs.handleFetchStart = function(){
+                cb();
+              };
+            },
+            function(cb){
+              cbs.handleFetchComplete = function(){
+                cb();
+              };
+            }
+        ], function(){
+          expect(handleFetchStart.calledOnce).to.be.true;
+          expect(handleFetchComplete.calledOnce).to.be.true;
+          expect(handleFetchComplete.calledAfter(handleFetchStart)).to.be.true;
+
+          expect(handleFetchComplete.args[0][0].detail).to.deep.equal({err: 'err cat'});
+
+          feedsHolder.removeEventListener('fetch-start', cbs.handleFetchStart);
+          feedsHolder.removeEventListener('fetch-complete', cbs.handleFetchComplete);
+          feedsHolder.removeEventListener('items-chaged', cbs.handleItemsChanged);
+          done();
+        });
+
+        var handleFetchStart = sinon.spy(cbs, "handleFetchStart");
+        var handleFetchComplete = sinon.spy(cbs, "handleFetchComplete");
+
+        feedsHolder.addEventListener('fetch-start', cbs.handleFetchStart);
+        feedsHolder.addEventListener('fetch-complete', cbs.handleFetchComplete);
+
+        var get_categories = sinon.stub();
+        get_categories.callsArgWithAsync(1, 'err cat', [{}]);
+        var get_feeds = sinon.stub();
+        get_feeds.callsArgWithAsync(1, 'err feed', [{}]);
+        var client = {
+          get_categories: get_categories,
+          get_feeds: get_feeds
+        };
+        feedsHolder.client = client;
+        feedsHolder.fetchHolder();
+      });
+
       it('should be receive `reload` events', function(done) {
         /* jshint expr:true */
         var cbs = {};
