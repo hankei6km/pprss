@@ -112,7 +112,6 @@ gulp.task('watch:test', ['watch:demo', 'test:local'], function(){
   gulp.watch(config.testFiles, ['test:reload']);
 });
 
-
 // ----------------
 // ttrss-node
 // ----------------
@@ -129,3 +128,6 @@ gulp.task('ttrss-node', function() {
     //
     .pipe(gulp.dest(config.dest));
 });
+
+// Build
+gulp.task('build', ['copy', 'ttrss-node']);
