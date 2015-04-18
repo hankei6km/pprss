@@ -3,7 +3,7 @@
 A [Tiny Tiny RSS](http://tt-rss.org/) client
 using [Polymer(0.5)](https://www.polymer-project.org/0.5/).
 
-[![screenshot](https://raw.githubusercontent.com/hankei6km/pprss/docs/master/screenshot1_thumb.png)](https://raw.githubusercontent.com/hankei6km/pprss/master/docs/screenshot1.png)
+[![screenshot](https://raw.githubusercontent.com/hankei6km/pprss/master/docs/screenshot1_thumb.png)](https://raw.githubusercontent.com/hankei6km/pprss/master/docs/screenshot1.png)
 
 ## Setup
 
